@@ -29,7 +29,10 @@ Example:
             print(f"{finding.column}: {finding.description}")
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
+
+# Load configuration (dotenv) on package import
+import lavendertown.config  # noqa: F401
 
 from lavendertown.inspector import Inspector
 from lavendertown.models import GhostFinding

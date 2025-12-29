@@ -18,6 +18,35 @@ from typing import Any
 import click
 
 try:
+    from rich.console import Console
+    from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich.table import Table
+    from rich.panel import Panel
+
+    _RICH_AVAILABLE = True
+except ImportError:
+    _RICH_AVAILABLE = False
+
+    # Create a mock Console class that mimics click.echo for fallback
+    class Console:  # type: ignore[no-redef]
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def print(self, *args: Any, **kwargs: Any) -> None:
+            click.echo(*args)
+
+        def status(self, *args: Any, **kwargs: Any) -> Any:
+            class Status:
+                def __enter__(self) -> Any:
+                    return self
+
+                def __exit__(self, *args: Any) -> None:
+                    pass
+
+            return Status()
+
+
+try:
     import pandas as pd
 except ImportError:
     pd = None  # type: ignore[assignment]
@@ -32,6 +61,9 @@ from lavendertown.export.csv import export_to_csv_file
 from lavendertown.export.json import export_to_json_file
 from lavendertown.rules.models import RuleSet
 from lavendertown.rules.storage import load_ruleset
+
+# Create a global console instance for Rich output
+_console = Console() if _RICH_AVAILABLE else Console()
 
 
 def _load_dataframe(filepath: str, backend: str = "pandas") -> Any:
@@ -236,12 +268,18 @@ def analyze(
     """
     try:
         if not quiet:
-            click.echo(f"Loading data from {filepath}...")
+            if _RICH_AVAILABLE:
+                _console.print(f"[cyan]Loading data from[/cyan] {filepath}...")
+            else:
+                click.echo(f"Loading data from {filepath}...")
 
         df = _load_dataframe(filepath, backend=backend)
 
         if not quiet:
-            click.echo(f"Analyzing {len(df)} rows...")
+            if _RICH_AVAILABLE:
+                _console.print(f"[cyan]Analyzing[/cyan] {len(df):,} rows...")
+            else:
+                click.echo(f"Analyzing {len(df)} rows...")
 
         inspector = Inspector(df)
 
@@ -250,7 +288,12 @@ def analyze(
         ruleset = _load_ruleset_from_file(rules)
         if ruleset and ruleset.rules:
             if verbose:
-                click.echo(f"Loaded {len(ruleset.rules)} rules from {rules}")
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        f"[green]Loaded[/green] {len(ruleset.rules)} rules from {rules}"
+                    )
+                else:
+                    click.echo(f"Loaded {len(ruleset.rules)} rules from {rules}")
             # Execute rules and add findings
             from lavendertown.ui.rules import execute_ruleset
 
@@ -258,7 +301,37 @@ def analyze(
             findings.extend(rule_findings)
 
         if not quiet:
-            click.echo(f"Found {len(findings)} data quality issues")
+            if _RICH_AVAILABLE:
+                # Create summary table
+                table = Table(
+                    title="Analysis Summary",
+                    show_header=True,
+                    header_style="bold magenta",
+                )
+                table.add_column("Metric", style="cyan")
+                table.add_column("Value", style="green", justify="right")
+
+                table.add_row("Total Findings", str(len(findings)))
+                if findings:
+                    # Count by type
+                    type_counts: dict[str, int] = {}
+                    severity_counts: dict[str, int] = {}
+                    for finding in findings:
+                        type_counts[finding.ghost_type] = (
+                            type_counts.get(finding.ghost_type, 0) + 1
+                        )
+                        severity_counts[finding.severity] = (
+                            severity_counts.get(finding.severity, 0) + 1
+                        )
+
+                    for ghost_type, count in sorted(type_counts.items()):
+                        table.add_row(f"  {ghost_type}", str(count))
+                    for severity, count in sorted(severity_counts.items()):
+                        table.add_row(f"  Severity: {severity}", str(count))
+
+                _console.print(table)
+            else:
+                click.echo(f"Found {len(findings)} data quality issues")
 
         # Determine output path
         extension = ".json" if output_format.lower() == "json" else ".csv"
@@ -271,10 +344,18 @@ def analyze(
             export_to_csv_file(findings, str(output_path))
 
         if not quiet:
-            click.echo(f"Results saved to {output_path}")
+            if _RICH_AVAILABLE:
+                _console.print(
+                    f"[green]✓[/green] Results saved to [bold]{output_path}[/bold]"
+                )
+            else:
+                click.echo(f"Results saved to {output_path}")
 
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
         if verbose:
             import traceback
 
@@ -331,51 +412,128 @@ def analyze_batch(
 
     csv_files = list(input_path.glob("*.csv"))
     if not csv_files:
-        click.echo(f"No CSV files found in {input_dir}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[bold red]Error:[/bold red] No CSV files found in {input_dir}"
+            )
+        else:
+            click.echo(f"No CSV files found in {input_dir}", err=True)
         sys.exit(1)
 
     if not quiet:
-        click.echo(f"Found {len(csv_files)} CSV files to process")
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[cyan]Found[/cyan] [bold]{len(csv_files)}[/bold] CSV files to process"
+            )
+        else:
+            click.echo(f"Found {len(csv_files)} CSV files to process")
 
     # Load ruleset if provided
     ruleset = _load_ruleset_from_file(rules)
     if ruleset and not quiet:
-        click.echo(f"Loaded {len(ruleset.rules)} rules from {rules}")
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[green]Loaded[/green] {len(ruleset.rules)} rules from {rules}"
+            )
+        else:
+            click.echo(f"Loaded {len(ruleset.rules)} rules from {rules}")
 
-    for i, csv_file in enumerate(csv_files, 1):
-        if not quiet:
-            click.echo(f"\n[{i}/{len(csv_files)}] Processing {csv_file.name}...")
+    if _RICH_AVAILABLE and not quiet:
+        # Use Rich progress bar for batch processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=_console,
+        ) as progress:
+            task = progress.add_task("[cyan]Processing files...", total=len(csv_files))
 
-        try:
-            df = _load_dataframe(str(csv_file), backend=backend)
-            inspector = Inspector(df)
+            results_table = Table(title="Batch Processing Results", show_header=True)
+            results_table.add_column("File", style="cyan")
+            results_table.add_column("Findings", style="green", justify="right")
+            results_table.add_column("Status", style="yellow")
 
-            findings = inspector.detect()
+            for csv_file in csv_files:
+                progress.update(task, description=f"Processing {csv_file.name}...")
 
-            # Execute rules if provided
-            if ruleset and ruleset.rules:
-                from lavendertown.ui.rules import execute_ruleset
+                try:
+                    df = _load_dataframe(str(csv_file), backend=backend)
+                    inspector = Inspector(df)
 
-                rule_findings = execute_ruleset(None, ruleset, df)  # type: ignore[arg-type]
-                findings.extend(rule_findings)
+                    findings = inspector.detect()
 
-            extension = ".json" if output_format.lower() == "json" else ".csv"
-            output_file = output_path / f"{csv_file.stem}_findings{extension}"
+                    # Execute rules if provided
+                    if ruleset and ruleset.rules:
+                        from lavendertown.ui.rules import execute_ruleset
 
-            if output_format.lower() == "json":
-                export_to_json_file(findings, str(output_file))
-            else:
-                export_to_csv_file(findings, str(output_file))
+                        rule_findings = execute_ruleset(
+                            None,
+                            ruleset,
+                            df,  # type: ignore[arg-type]
+                        )
+                        findings.extend(rule_findings)
 
+                    extension = ".json" if output_format.lower() == "json" else ".csv"
+                    output_file = output_path / f"{csv_file.stem}_findings{extension}"
+
+                    if output_format.lower() == "json":
+                        export_to_json_file(findings, str(output_file))
+                    else:
+                        export_to_csv_file(findings, str(output_file))
+
+                    results_table.add_row(
+                        csv_file.name, str(len(findings)), "[green]✓[/green]"
+                    )
+                    progress.advance(task)
+
+                except Exception as e:
+                    results_table.add_row(csv_file.name, "Error", f"[red]✗[/red] {e}")
+                    progress.advance(task)
+                    continue
+
+            _console.print(results_table)
+            _console.print(
+                f"\n[green]✓[/green] Batch processing complete. Results in [bold]{output_dir}[/bold]"
+            )
+    else:
+        # Fallback to basic output
+        for i, csv_file in enumerate(csv_files, 1):
             if not quiet:
-                click.echo(f"  Found {len(findings)} issues -> {output_file.name}")
+                click.echo(f"\n[{i}/{len(csv_files)}] Processing {csv_file.name}...")
 
-        except Exception as e:
-            click.echo(f"  Error processing {csv_file.name}: {e}", err=True)
-            continue
+            try:
+                df = _load_dataframe(str(csv_file), backend=backend)
+                inspector = Inspector(df)
 
-    if not quiet:
-        click.echo(f"\nBatch processing complete. Results in {output_dir}")
+                findings = inspector.detect()
+
+                # Execute rules if provided
+                if ruleset and ruleset.rules:
+                    from lavendertown.ui.rules import execute_ruleset
+
+                    rule_findings = execute_ruleset(
+                        None,
+                        ruleset,
+                        df,  # type: ignore[arg-type]
+                    )
+                    findings.extend(rule_findings)
+
+                extension = ".json" if output_format.lower() == "json" else ".csv"
+                output_file = output_path / f"{csv_file.stem}_findings{extension}"
+
+                if output_format.lower() == "json":
+                    export_to_json_file(findings, str(output_file))
+                else:
+                    export_to_csv_file(findings, str(output_file))
+
+                if not quiet:
+                    click.echo(f"  Found {len(findings)} issues -> {output_file.name}")
+
+            except Exception as e:
+                click.echo(f"  Error processing {csv_file.name}: {e}", err=True)
+                continue
+
+        if not quiet:
+            click.echo(f"\nBatch processing complete. Results in {output_dir}")
 
 
 @cli.command()
@@ -431,13 +589,22 @@ def compare(
         lavendertown compare baseline.csv current.csv --output-format json
     """
     try:
-        click.echo(f"Loading baseline: {baseline_file}...")
+        if _RICH_AVAILABLE:
+            _console.print(f"[cyan]Loading baseline:[/cyan] {baseline_file}...")
+        else:
+            click.echo(f"Loading baseline: {baseline_file}...")
         baseline_df = _load_dataframe(baseline_file, backend=backend)
 
-        click.echo(f"Loading current: {current_file}...")
+        if _RICH_AVAILABLE:
+            _console.print(f"[cyan]Loading current:[/cyan] {current_file}...")
+        else:
+            click.echo(f"Loading current: {current_file}...")
         current_df = _load_dataframe(current_file, backend=backend)
 
-        click.echo("Comparing datasets...")
+        if _RICH_AVAILABLE:
+            _console.print("[cyan]Comparing datasets...[/cyan]")
+        else:
+            click.echo("Comparing datasets...")
         inspector = Inspector(current_df)
         drift_findings = inspector.compare_with_baseline(
             baseline_df=baseline_df,
@@ -445,7 +612,12 @@ def compare(
             distribution_threshold=distribution_threshold,
         )
 
-        click.echo(f"Found {len(drift_findings)} drift issues")
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[yellow]Found[/yellow] [bold]{len(drift_findings)}[/bold] drift issues"
+            )
+        else:
+            click.echo(f"Found {len(drift_findings)} drift issues")
 
         # Determine output path
         extension = ".json" if output_format.lower() == "json" else ".csv"
@@ -457,10 +629,18 @@ def compare(
         else:
             export_to_csv_file(drift_findings, str(output_path))
 
-        click.echo(f"Results saved to {output_path}")
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[green]✓[/green] Results saved to [bold]{output_path}[/bold]"
+            )
+        else:
+            click.echo(f"Results saved to {output_path}")
 
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
 
@@ -496,7 +676,10 @@ def export_rules(
         lavendertown export-rules rules.json --format pandera --output-file schema.py
     """
     try:
-        click.echo(f"Loading rules from {rules_file}...")
+        if _RICH_AVAILABLE:
+            _console.print(f"[cyan]Loading rules from[/cyan] {rules_file}...")
+        else:
+            click.echo(f"Loading rules from {rules_file}...")
         ruleset = load_ruleset(rules_file)
 
         if export_format == "pandera":
@@ -511,12 +694,18 @@ def export_rules(
                 export_ruleset_to_pandera_file(
                     ruleset, output_file, schema_info=schema_info_dict
                 )
-                click.echo(f"Pandera schema exported to {output_file}")
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        f"[green]✓[/green] Pandera schema exported to [bold]{output_file}[/bold]"
+                    )
+                else:
+                    click.echo(f"Pandera schema exported to {output_file}")
             except ImportError:
-                click.echo(
-                    "Error: pandera is required. Install with: pip install lavendertown[pandera]",
-                    err=True,
-                )
+                error_msg = "Error: pandera is required. Install with: pip install lavendertown[pandera]"
+                if _RICH_AVAILABLE:
+                    _console.print(f"[bold red]{error_msg}[/bold red]")
+                else:
+                    click.echo(error_msg, err=True)
                 sys.exit(1)
 
         elif export_format == "great_expectations":
@@ -526,16 +715,25 @@ def export_rules(
                 )
 
                 export_ruleset_to_great_expectations_file(ruleset, output_file)
-                click.echo(f"Great Expectations suite exported to {output_file}")
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        f"[green]✓[/green] Great Expectations suite exported to [bold]{output_file}[/bold]"
+                    )
+                else:
+                    click.echo(f"Great Expectations suite exported to {output_file}")
             except ImportError:
-                click.echo(
-                    "Error: great-expectations is required. Install with: pip install lavendertown[great_expectations]",
-                    err=True,
-                )
+                error_msg = "Error: great-expectations is required. Install with: pip install lavendertown[great_expectations]"
+                if _RICH_AVAILABLE:
+                    _console.print(f"[bold red]{error_msg}[/bold red]")
+                else:
+                    click.echo(error_msg, err=True)
                 sys.exit(1)
 
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
 
@@ -580,7 +778,10 @@ def share(
         )
         from lavendertown.models import GhostFinding
 
-        click.echo(f"Loading findings from {findings_file}...")
+        if _RICH_AVAILABLE:
+            _console.print(f"[cyan]Loading findings from[/cyan] {findings_file}...")
+        else:
+            click.echo(f"Loading findings from {findings_file}...")
 
         # Load findings
         with open(findings_file, "r") as f:
@@ -603,10 +804,18 @@ def share(
 
         # Export
         report_path = export_report(report, output_file)
-        click.echo(f"Report exported to: {report_path}")
+        if _RICH_AVAILABLE:
+            _console.print(
+                f"[green]✓[/green] Report exported to: [bold]{report_path}[/bold]"
+            )
+        else:
+            click.echo(f"Report exported to: {report_path}")
 
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
 
@@ -629,15 +838,30 @@ def import_report(
     try:
         from lavendertown.collaboration.api import import_report
 
-        click.echo(f"Importing report from {report_file}...")
+        if _RICH_AVAILABLE:
+            _console.print(f"[cyan]Importing report from[/cyan] {report_file}...")
+        else:
+            click.echo(f"Importing report from {report_file}...")
 
         report = import_report(report_file)
 
-        click.echo(f"Report: {report.title}")
-        click.echo(f"Author: {report.author}")
-        click.echo(f"Created: {report.created_at}")
-        click.echo(f"Findings: {len(report.findings)}")
-        click.echo(f"Annotations: {len(report.annotations)}")
+        if _RICH_AVAILABLE:
+            panel = Panel.fit(
+                f"[bold]Title:[/bold] {report.title}\n"
+                f"[bold]Author:[/bold] {report.author}\n"
+                f"[bold]Created:[/bold] {report.created_at}\n"
+                f"[bold]Findings:[/bold] {len(report.findings)}\n"
+                f"[bold]Annotations:[/bold] {len(report.annotations)}",
+                title="Report Information",
+                border_style="green",
+            )
+            _console.print(panel)
+        else:
+            click.echo(f"Report: {report.title}")
+            click.echo(f"Author: {report.author}")
+            click.echo(f"Created: {report.created_at}")
+            click.echo(f"Findings: {len(report.findings)}")
+            click.echo(f"Annotations: {len(report.annotations)}")
 
         if output_dir:
             output_path = Path(output_dir)
@@ -647,17 +871,30 @@ def import_report(
             findings_file = output_path / "findings.json"
             with open(findings_file, "w") as f:
                 json.dump([f.to_dict() for f in report.findings], f, indent=2)
-            click.echo(f"Findings exported to {findings_file}")
+            if _RICH_AVAILABLE:
+                _console.print(
+                    f"[green]✓[/green] Findings exported to [bold]{findings_file}[/bold]"
+                )
+            else:
+                click.echo(f"Findings exported to {findings_file}")
 
             # Export ruleset if present
             if report.ruleset:
                 ruleset_file = output_path / "ruleset.json"
                 with open(ruleset_file, "w") as f:
                     json.dump(report.ruleset.to_dict(), f, indent=2)
-                click.echo(f"Ruleset exported to {ruleset_file}")
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        f"[green]✓[/green] Ruleset exported to [bold]{ruleset_file}[/bold]"
+                    )
+                else:
+                    click.echo(f"Ruleset exported to {ruleset_file}")
 
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lavendertown"
-version = "0.3.0"
+version = "0.4.0"
 description = "A Streamlit-first Python package for detecting and visualizing data quality issues"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -37,6 +37,7 @@ dev = [
     "black>=23.0.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
+    "hypothesis>=6.0.0",
 ]
 polars = [
     "polars>=0.19.0",
@@ -55,11 +56,18 @@ ml = [
 timeseries = [
     "statsmodels>=0.14.0",
 ]
+cli = [
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+]
 all = [
     "pandera>=0.18.0",
     "great-expectations>=0.18.0",
     "scikit-learn>=1.0.0",
     "statsmodels>=0.14.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "orjson>=3.9.0",
 ]
 
 [project.scripts]
@@ -112,4 +120,16 @@ python_functions = ["test_*"]
 # Enable doctest discovery and execution
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 addopts = "--doctest-modules"
+# Suppress warnings from third-party dependencies
+# - Streamlit's async fixture warnings (will be resolved in future Streamlit versions)
+# - jsonschema deprecation warnings from altair dependencies (will be resolved when altair updates)
+# - Pandera import warnings (informational about future API changes)
+# - Marshmallow warnings from great_expectations dependencies
+filterwarnings = [
+    "ignore::pytest.PytestRemovedIn9Warning",
+    "ignore::DeprecationWarning:altair.*",
+    "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning",
+    "ignore::FutureWarning:pandera.*",
+    "ignore:`Number` field should not be instantiated:Warning",
+]
 
