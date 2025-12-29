@@ -29,8 +29,8 @@ The design prioritizes:
 │Detector│ │Detector│ │Detector│
 │(Nulls) │ │(Types) │ │(Stats) │
 └────┬───┘ └────┬───┘ └────┬───┘
-     │           │           │
-     └───────────┴───────────┘
+     │          │          │
+     └──────────┴──────────┘
                  │
                  ▼
         ┌──────────────────┐
@@ -41,8 +41,8 @@ The design prioritizes:
         ┌─────────┼─────────┐
         ▼                   ▼
 ┌──────────────┐   ┌────────────────┐
-│ Streamlit UI │   │ Exporters       │
-│ (Charts &    │   │ (JSON / CSV)    │
+│ Streamlit UI │   │ Exporters      │
+│ (Charts &    │   │ (JSON / CSV)   │
 │  Tables)     │   └────────────────┘
 └──────────────┘
 ```
