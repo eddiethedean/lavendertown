@@ -10,6 +10,7 @@ def compare_distributions(
     baseline_df: object,
     current_df: object,
     threshold_percent: float = 10.0,
+    use_statistical_tests: bool = True,
 ) -> list[GhostFinding]:
     """Compare data distributions between two DataFrames.
 
@@ -23,6 +24,8 @@ def compare_distributions(
         baseline_df: Baseline DataFrame (Pandas or Polars)
         current_df: Current DataFrame (Pandas or Polars)
         threshold_percent: Percentage threshold for considering changes significant
+        use_statistical_tests: If True, include statistical tests (KS test for numeric,
+            chi-square for categorical) in metadata. Default is True.
 
     Returns:
         List of GhostFinding objects for distribution differences
@@ -65,6 +68,7 @@ def compare_distributions(
             baseline_backend,
             current_backend,
             threshold_percent,
+            use_statistical_tests,
         )
         findings.extend(cardinality_findings)
 
@@ -76,8 +80,20 @@ def compare_distributions(
             baseline_backend,
             current_backend,
             threshold_percent,
+            use_statistical_tests,
         )
         findings.extend(range_findings)
+
+        # Compare categorical distributions with chi-square test
+        if use_statistical_tests:
+            categorical_findings = _compare_categorical_distributions(
+                baseline_df,
+                current_df,
+                column,
+                baseline_backend,
+                current_backend,
+            )
+            findings.extend(categorical_findings)
 
     return findings
 
@@ -145,6 +161,7 @@ def _compare_cardinality(
     baseline_backend: str,
     current_backend: str,
     threshold_percent: float,
+    use_statistical_tests: bool = True,
 ) -> list[GhostFinding]:
     """Compare cardinality (unique value counts) for categorical columns."""
     findings: list[GhostFinding] = []
@@ -207,6 +224,7 @@ def _compare_numeric_ranges(
     baseline_backend: str,
     current_backend: str,
     threshold_percent: float,
+    use_statistical_tests: bool = True,
 ) -> list[GhostFinding]:
     """Compare numeric ranges (min/max) for numeric columns."""
     findings: list[GhostFinding] = []
@@ -285,23 +303,137 @@ def _compare_numeric_ranges(
                 f"to [{current_min:.2f}, {current_max:.2f}]"
             )
 
+            metadata = {
+                "drift_type": "distribution",
+                "change_type": "numeric_range",
+                "baseline_min": float(baseline_min),
+                "baseline_max": float(baseline_max),
+                "current_min": float(current_min),
+                "current_max": float(current_max),
+                "min_shift_pct": float(min_shift_pct),
+                "max_shift_pct": float(max_shift_pct),
+            }
+
+            # Add statistical test results if requested
+            if use_statistical_tests:
+                try:
+                    from scipy import stats
+
+                    # Perform Kolmogorov-Smirnov test
+                    ks_statistic, p_value = stats.ks_2samp(
+                        baseline_data.values
+                        if baseline_backend == "pandas"
+                        else baseline_data.to_numpy(),
+                        current_data.values
+                        if current_backend == "pandas"
+                        else current_data.to_numpy(),
+                    )
+                    metadata["ks_statistic"] = float(ks_statistic)
+                    metadata["ks_p_value"] = float(p_value)
+                except ImportError:
+                    # scipy not available, skip statistical test
+                    pass
+                except Exception:
+                    # Test failed (e.g., insufficient data), skip
+                    pass
+
             findings.append(
                 GhostFinding(
                     ghost_type="drift",
                     column=column,
                     severity=severity,
                     description=f"Column '{column}' {change_desc}",
-                    metadata={
-                        "drift_type": "distribution",
-                        "change_type": "numeric_range",
-                        "baseline_min": float(baseline_min),
-                        "baseline_max": float(baseline_max),
-                        "current_min": float(current_min),
-                        "current_max": float(current_max),
-                        "min_shift_pct": float(min_shift_pct),
-                        "max_shift_pct": float(max_shift_pct),
-                    },
+                    metadata=metadata,
                 )
             )
+
+    return findings
+
+
+def _compare_categorical_distributions(
+    baseline_df: object,
+    current_df: object,
+    column: str,
+    baseline_backend: str,
+    current_backend: str,
+) -> list[GhostFinding]:
+    """Compare categorical distributions using chi-square test.
+
+    Args:
+        baseline_df: Baseline DataFrame
+        current_df: Current DataFrame
+        column: Column name to compare
+        baseline_backend: Backend type for baseline ("pandas" or "polars")
+        current_backend: Backend type for current ("pandas" or "polars")
+
+    Returns:
+        List of GhostFinding objects (empty list if no significant drift)
+    """
+    findings: list[GhostFinding] = []
+
+    try:
+        from scipy import stats
+    except ImportError:
+        # scipy not available, skip statistical test
+        return findings
+
+    # Get value counts for both DataFrames
+    if baseline_backend == "pandas":
+        baseline_counts = baseline_df[column].value_counts()  # type: ignore[attr-defined,index]
+    else:
+        baseline_counts = (
+            baseline_df[column].value_counts().to_pandas().set_index(column)["count"]  # type: ignore[attr-defined,index]
+        )
+
+    if current_backend == "pandas":
+        current_counts = current_df[column].value_counts()  # type: ignore[attr-defined,index]
+    else:
+        current_counts = (
+            current_df[column].value_counts().to_pandas().set_index(column)["count"]  # type: ignore[attr-defined,index]
+        )
+
+    # Get all unique values
+    all_values = set(baseline_counts.index) | set(current_counts.index)
+
+    if len(all_values) < 2:
+        # Need at least 2 categories for chi-square test
+        return findings
+
+    # Create contingency table
+    contingency = []
+    for value in all_values:
+        baseline_count = int(baseline_counts.get(value, 0))
+        current_count = int(current_counts.get(value, 0))
+        contingency.append([baseline_count, current_count])
+
+    try:
+        # Perform chi-square test
+        chi2_statistic, p_value, dof, expected = stats.chi2_contingency(contingency)
+
+        # Consider significant if p-value < 0.05
+        if p_value < 0.05:
+            severity = "warning" if p_value < 0.01 else "info"
+
+            finding = GhostFinding(
+                ghost_type="drift",
+                column=column,
+                severity=severity,
+                description=(
+                    f"Column '{column}' shows significant distribution change "
+                    f"(chi-square p-value: {p_value:.4f})"
+                ),
+                metadata={
+                    "drift_type": "distribution",
+                    "change_type": "categorical_distribution",
+                    "chi2_statistic": float(chi2_statistic),
+                    "chi2_p_value": float(p_value),
+                    "degrees_of_freedom": int(dof),
+                },
+            )
+            findings.append(finding)
+
+    except Exception:
+        # Test failed (e.g., insufficient data), skip
+        pass
 
     return findings

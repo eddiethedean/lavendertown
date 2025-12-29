@@ -91,15 +91,49 @@ findings = inspector.detect()
 - `moving_avg`: Detects deviations from rolling average
 - `seasonal`: Removes seasonal patterns before detection (requires statsmodels)
 
+### ChangePointDetector (New in Phase 6)
+
+Detects change points in time-series data using the Ruptures library.
+
+```python
+from lavendertown.detectors.changepoint import ChangePointDetector
+from lavendertown import Inspector
+
+# PELT algorithm (default)
+cp_detector = ChangePointDetector(
+    datetime_column="timestamp",
+    algorithm="pelt",
+    penalty=10.0
+)
+
+inspector = Inspector(df, detectors=[cp_detector])
+findings = inspector.detect()
+```
+
+**Configuration:**
+- `datetime_column`: Name of datetime column (None for auto-detect)
+- `algorithm`: Change point algorithm ("pelt", "binseg", "dynp", "window")
+- `min_size`: Minimum segment length (default: 2)
+- `penalty`: Penalty value for number of change points (default: 10.0)
+- `jump`: Minimum distance between change points (default: 1)
+
+**Algorithms:**
+- `pelt`: Pruned Exact Linear Time (default, fast and efficient)
+- `binseg`: Binary segmentation
+- `dynp`: Dynamic programming
+- `window`: Window-based detection
+
+**Note:** Requires `lavendertown[timeseries]` (`pip install lavendertown[timeseries]`)
+
 ### MLAnomalyDetector
 
-Uses machine learning algorithms to detect complex anomalies.
+Uses machine learning algorithms to detect complex anomalies. Supports both scikit-learn and PyOD algorithms (Phase 6).
 
 ```python
 from lavendertown.detectors.ml_anomaly import MLAnomalyDetector
 from lavendertown import Inspector
 
-# Isolation Forest
+# Isolation Forest (scikit-learn)
 ml_detector = MLAnomalyDetector(
     algorithm="isolation_forest",
     contamination=0.1  # Expected 10% anomalies
@@ -110,16 +144,37 @@ findings = inspector.detect()
 ```
 
 **Configuration:**
-- `algorithm`: ML algorithm ("isolation_forest", "lof", "one_class_svm")
+- `algorithm`: ML algorithm (see below for available algorithms)
 - `contamination`: Expected proportion of anomalies (0.0 to 0.5)
 - `random_state`: Random seed for reproducibility
 
-**Algorithms:**
+**Scikit-learn Algorithms:**
 - `isolation_forest`: Good for general anomaly detection
 - `lof`: Local Outlier Factor (density-based)
 - `one_class_svm`: Boundary-based detection
 
-**Note:** Requires `scikit-learn` (`pip install lavendertown[ml]`)
+**PyOD Algorithms (Phase 6 - requires `lavendertown[ml]`):**
+With PyOD installed, you can use 40+ additional algorithms:
+- `abod`: Angle-Based Outlier Detection
+- `cblof`: Clustering-Based Local Outlier Factor
+- `hbos`: Histogram-based Outlier Score
+- `knn`: K-Nearest Neighbors
+- `mcd`: Minimum Covariance Determinant
+- `pca`: Principal Component Analysis
+- `iforest`: Isolation Forest (PyOD version)
+- `ocsvm`: One-Class SVM (PyOD version)
+- And many more! See PyOD documentation for the full list
+
+**Example with PyOD:**
+```python
+# Use PyOD algorithm
+ml_detector = MLAnomalyDetector(
+    algorithm="abod",  # PyOD algorithm
+    contamination=0.1
+)
+```
+
+**Note:** Requires `lavendertown[ml]` which includes both scikit-learn and PyOD
 
 ## Default Detectors
 
@@ -137,11 +192,15 @@ You can use multiple detectors together:
 from lavendertown.detectors.null import NullGhostDetector
 from lavendertown.detectors.outlier import OutlierGhostDetector
 from lavendertown.detectors.timeseries import TimeSeriesAnomalyDetector
+from lavendertown.detectors.changepoint import ChangePointDetector
+from lavendertown.detectors.ml_anomaly import MLAnomalyDetector
 
 detectors = [
     NullGhostDetector(null_threshold=0.15),
     OutlierGhostDetector(multiplier=2.0),
-    TimeSeriesAnomalyDetector(method="zscore")
+    TimeSeriesAnomalyDetector(method="zscore"),
+    ChangePointDetector(algorithm="pelt"),  # Phase 6
+    MLAnomalyDetector(algorithm="abod", contamination=0.1)  # Phase 6 PyOD
 ]
 
 inspector = Inspector(df, detectors=detectors)

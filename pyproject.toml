@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lavendertown"
-version = "0.4.0"
+version = "0.5.0"
 description = "A Streamlit-first Python package for detecting and visualizing data quality issues"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -31,14 +31,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "mypy>=1.0.0",
-    "ruff>=0.1.0",
-    "hypothesis>=6.0.0",
-]
 polars = [
     "polars>=0.19.0",
 ]
@@ -52,22 +44,49 @@ great_expectations = [
 # LavenderTown is compatible with both altair 4.x and 5.x
 ml = [
     "scikit-learn>=1.0.0",
+    "pyod>=1.1.0",
 ]
 timeseries = [
     "statsmodels>=0.14.0",
+    "ruptures>=1.1.0",
+]
+stats = [
+    "scipy>=1.10.0",
+]
+parquet = [
+    "pyarrow>=14.0.0",
+]
+profiling = [
+    "ydata-profiling>=4.5.0",
 ]
 cli = [
     "rich>=13.0.0",
     "python-dotenv>=1.0.0",
+    "typer>=0.9.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+    "hypothesis>=6.0.0",
+    "faker>=20.0.0",
 ]
 all = [
     "pandera>=0.18.0",
     "great-expectations>=0.18.0",
     "scikit-learn>=1.0.0",
+    "pyod>=1.1.0",
     "statsmodels>=0.14.0",
+    "ruptures>=1.1.0",
+    "scipy>=1.10.0",
+    "pyarrow>=14.0.0",
+    "ydata-profiling>=4.5.0",
     "rich>=13.0.0",
     "python-dotenv>=1.0.0",
     "orjson>=3.9.0",
+    "typer>=0.9.0",
 ]
 
 [project.scripts]

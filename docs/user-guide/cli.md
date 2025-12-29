@@ -2,6 +2,8 @@
 
 LavenderTown includes a powerful CLI with beautiful, interactive output for batch processing and automation. The CLI features progress bars, formatted tables, and color-coded messages for an enhanced user experience.
 
+**Phase 6 Update:** LavenderTown now includes both a Click-based CLI (the original) and a Typer-based CLI (new). Both support the same commands and options, including Parquet export format.
+
 ## Installation
 
 The CLI is installed automatically with LavenderTown:
@@ -39,12 +41,14 @@ lavendertown analyze data.csv
 
 **Options:**
 - `--rules PATH`: Path to rules JSON file
-- `--output-format [json|csv]`: Output format (default: `json`)
+- `--output-format [json|csv|parquet]`: Output format (default: `json`)
 - `--output-dir DIRECTORY`: Output directory
 - `--output-file PATH`: Specific output file path
 - `--backend [pandas|polars]`: DataFrame backend (default: `pandas`)
 - `--quiet`: Suppress progress output
 - `--verbose`: Verbose output
+
+**Note:** Parquet export requires `lavendertown[parquet]` (`pip install lavendertown[parquet]`)
 
 **Examples:**
 ```bash
@@ -67,7 +71,7 @@ lavendertown analyze-batch data/ --output-dir results/
 ```
 
 **Options:**
-- Same as `analyze` command
+- Same as `analyze` command (including `--output-format [json|csv|parquet]`)
 - Processes all CSV files in the specified directory
 
 **Example:**
@@ -86,9 +90,11 @@ lavendertown compare baseline.csv current.csv
 
 **Options:**
 - `--comparison-type [full|schema_only|distribution_only]`: Type of comparison
-- `--output-format [json|csv]`: Output format
+- `--output-format [json|csv|parquet]`: Output format
 - `--output-file PATH`: Output file path
 - `--backend [pandas|polars]`: DataFrame backend
+
+**Note:** Parquet export requires `lavendertown[parquet]` (`pip install lavendertown[parquet]`)
 
 **Example:**
 ```bash
@@ -169,6 +175,29 @@ Tabular CSV output:
 ghost_type,column,severity,description,row_indices
 null,price,info,"Column 'price' has 1 null values (12.5% of 8 rows)","[2]"
 ```
+
+### Parquet (Phase 6)
+
+Efficient columnar storage format for large datasets. Ideal for analytics workloads and long-term storage:
+
+```bash
+lavendertown analyze data.csv --output-format parquet --output-file findings.parquet
+```
+
+**Features:**
+- Columnar storage (efficient compression)
+- Multiple compression codecs (snappy, gzip, brotli, zstd, lz4)
+- Fast read/write performance
+- Schema preservation
+
+**Reading Parquet files:**
+```python
+from lavendertown.export.parquet import read_findings_from_parquet
+
+findings = read_findings_from_parquet("findings.parquet")
+```
+
+**Note:** Requires `lavendertown[parquet]` (`pip install lavendertown[parquet]`)
 
 ## Automation Examples
 

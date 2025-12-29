@@ -46,3 +46,20 @@ try:
     )
 except ImportError:
     pass
+
+try:
+    from lavendertown.export.parquet import (  # noqa: F401
+        export_findings_to_parquet,
+        export_findings_to_parquet_bytes,
+        read_findings_from_parquet,
+    )
+
+    __all__.extend(
+        [
+            "export_findings_to_parquet",
+            "export_findings_to_parquet_bytes",
+            "read_findings_from_parquet",
+        ]
+    )
+except ImportError:
+    pass

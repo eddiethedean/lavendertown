@@ -192,7 +192,7 @@ def cli() -> None:
 )
 @click.option(
     "--output-format",
-    type=click.Choice(["json", "csv"], case_sensitive=False),
+    type=click.Choice(["json", "csv", "parquet"], case_sensitive=False),
     default="json",
     help="Output format",
 )
@@ -334,12 +334,36 @@ def analyze(
                 click.echo(f"Found {len(findings)} data quality issues")
 
         # Determine output path
-        extension = ".json" if output_format.lower() == "json" else ".csv"
+        format_lower = output_format.lower()
+        if format_lower == "json":
+            extension = ".json"
+        elif format_lower == "parquet":
+            extension = ".parquet"
+        else:
+            extension = ".csv"
         output_path = _get_output_path(filepath, output_dir, output_file, extension)
 
         # Export findings
-        if output_format.lower() == "json":
+        if format_lower == "json":
             export_to_json_file(findings, str(output_path))
+        elif format_lower == "parquet":
+            try:
+                from lavendertown.export.parquet import export_findings_to_parquet
+
+                export_findings_to_parquet(findings, str(output_path))
+            except ImportError:
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        "[red]Error:[/red] PyArrow is required for Parquet export. "
+                        "Install with: pip install lavendertown[parquet]"
+                    )
+                else:
+                    click.echo(
+                        "Error: PyArrow is required for Parquet export. "
+                        "Install with: pip install lavendertown[parquet]",
+                        err=True,
+                    )
+                sys.exit(1)
         else:
             export_to_csv_file(findings, str(output_path))
 
@@ -378,7 +402,7 @@ def analyze(
 )
 @click.option(
     "--output-format",
-    type=click.Choice(["json", "csv"], case_sensitive=False),
+    type=click.Choice(["json", "csv", "parquet"], case_sensitive=False),
     default="json",
     help="Output format",
 )
@@ -472,11 +496,30 @@ def analyze_batch(
                         )
                         findings.extend(rule_findings)
 
-                    extension = ".json" if output_format.lower() == "json" else ".csv"
+                    format_lower = output_format.lower()
+                    if format_lower == "json":
+                        extension = ".json"
+                    elif format_lower == "parquet":
+                        extension = ".parquet"
+                    else:
+                        extension = ".csv"
                     output_file = output_path / f"{csv_file.stem}_findings{extension}"
 
-                    if output_format.lower() == "json":
+                    if format_lower == "json":
                         export_to_json_file(findings, str(output_file))
+                    elif format_lower == "parquet":
+                        try:
+                            from lavendertown.export.parquet import (
+                                export_findings_to_parquet,
+                            )
+
+                            export_findings_to_parquet(findings, str(output_file))
+                        except ImportError:
+                            progress.console.print(
+                                "[red]Error:[/red] PyArrow is required for Parquet export. "
+                                "Install with: pip install lavendertown[parquet]"
+                            )
+                            continue
                     else:
                         export_to_csv_file(findings, str(output_file))
 
@@ -517,11 +560,31 @@ def analyze_batch(
                     )
                     findings.extend(rule_findings)
 
-                extension = ".json" if output_format.lower() == "json" else ".csv"
+                format_lower = output_format.lower()
+                if format_lower == "json":
+                    extension = ".json"
+                elif format_lower == "parquet":
+                    extension = ".parquet"
+                else:
+                    extension = ".csv"
                 output_file = output_path / f"{csv_file.stem}_findings{extension}"
 
-                if output_format.lower() == "json":
+                if format_lower == "json":
                     export_to_json_file(findings, str(output_file))
+                elif format_lower == "parquet":
+                    try:
+                        from lavendertown.export.parquet import (
+                            export_findings_to_parquet,
+                        )
+
+                        export_findings_to_parquet(findings, str(output_file))
+                    except ImportError:
+                        click.echo(
+                            "Error: PyArrow is required for Parquet export. "
+                            "Install with: pip install lavendertown[parquet]",
+                            err=True,
+                        )
+                        continue
                 else:
                     export_to_csv_file(findings, str(output_file))
 
@@ -620,12 +683,36 @@ def compare(
             click.echo(f"Found {len(drift_findings)} drift issues")
 
         # Determine output path
-        extension = ".json" if output_format.lower() == "json" else ".csv"
+        format_lower = output_format.lower()
+        if format_lower == "json":
+            extension = ".json"
+        elif format_lower == "parquet":
+            extension = ".parquet"
+        else:
+            extension = ".csv"
         output_path = _get_output_path(current_file, output_dir, output_file, extension)
 
         # Export findings
-        if output_format.lower() == "json":
+        if format_lower == "json":
             export_to_json_file(drift_findings, str(output_path))
+        elif format_lower == "parquet":
+            try:
+                from lavendertown.export.parquet import export_findings_to_parquet
+
+                export_findings_to_parquet(drift_findings, str(output_path))
+            except ImportError:
+                if _RICH_AVAILABLE:
+                    _console.print(
+                        "[red]Error:[/red] PyArrow is required for Parquet export. "
+                        "Install with: pip install lavendertown[parquet]"
+                    )
+                else:
+                    click.echo(
+                        "Error: PyArrow is required for Parquet export. "
+                        "Install with: pip install lavendertown[parquet]",
+                        err=True,
+                    )
+                sys.exit(1)
         else:
             export_to_csv_file(drift_findings, str(output_path))
 
@@ -890,6 +977,105 @@ def import_report(
                 else:
                     click.echo(f"Ruleset exported to {ruleset_file}")
 
+    except Exception as e:
+        if _RICH_AVAILABLE:
+            _console.print(f"[bold red]Error:[/bold red] {e}")
+        else:
+            click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("filepath", type=click.Path(exists=True))
+@click.option(
+    "--output",
+    type=click.Path(),
+    help="Output HTML file path (default: <filename>_profile.html)",
+)
+@click.option(
+    "--minimal",
+    is_flag=True,
+    help="Generate minimal report (faster)",
+)
+@click.option(
+    "--title",
+    default="Data Profiling Report",
+    help="Report title",
+)
+@click.option(
+    "--backend",
+    type=click.Choice(["pandas", "polars"], case_sensitive=False),
+    default="pandas",
+    help="DataFrame backend",
+)
+@click.option(
+    "--quiet",
+    is_flag=True,
+    help="Suppress progress output",
+)
+def profile(
+    filepath: str,
+    output: str | None,
+    minimal: bool,
+    title: str,
+    backend: str,
+    quiet: bool,
+) -> None:
+    """Generate a comprehensive data profiling report.
+
+    Creates an HTML profiling report with statistics, distributions, correlations,
+    and data quality insights using ydata-profiling.
+
+    Example:
+        lavendertown profile data.csv --output report.html
+    """
+    try:
+        from lavendertown.profiling import generate_profiling_report
+
+        if not quiet:
+            if _RICH_AVAILABLE:
+                _console.print(f"[cyan]Loading data from {filepath}...[/cyan]")
+            else:
+                click.echo(f"Loading data from {filepath}...")
+
+        df = _load_dataframe(filepath, backend=backend)
+
+        if not quiet:
+            if _RICH_AVAILABLE:
+                _console.print("[cyan]Generating profile report...[/cyan]")
+            else:
+                click.echo("Generating profile report...")
+
+        # Determine output path
+        if output:
+            output_path = output
+        else:
+            input_path = Path(filepath)
+            output_path = str(input_path.parent / f"{input_path.stem}_profile.html")
+
+        generate_profiling_report(df, output_path, minimal=minimal, title=title)
+
+        if not quiet:
+            if _RICH_AVAILABLE:
+                _console.print(
+                    f"[green]✓[/green] Profile report saved to [bold]{output_path}[/bold]"
+                )
+            else:
+                click.echo(f"Profile report saved to {output_path}")
+
+    except ImportError:
+        if _RICH_AVAILABLE:
+            _console.print(
+                "[red]Error:[/red] ydata-profiling is required for profiling reports. "
+                "Install with: pip install lavendertown[profiling]"
+            )
+        else:
+            click.echo(
+                "Error: ydata-profiling is required for profiling reports. "
+                "Install with: pip install lavendertown[profiling]",
+                err=True,
+            )
+        sys.exit(1)
     except Exception as e:
         if _RICH_AVAILABLE:
             _console.print(f"[bold red]Error:[/bold red] {e}")

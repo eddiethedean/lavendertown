@@ -10,13 +10,16 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit
 - **Interactive ghost detection** - Drill down into problematic rows
 - **Pandas & Polars support** - Works with your existing data pipelines
-- **Exportable findings** - Download results as JSON or CSV with one click
-- **Dataset Comparison** - Detect schema and distribution drift between datasets
+- **Exportable findings** - Download results as JSON, CSV, or Parquet with one click
+- **Dataset Comparison** - Detect schema and distribution drift between datasets with statistical tests
 - **Custom Rules** - Create and manage custom data quality rules via UI
 - **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
-- **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing
+- **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer)
 - **Ecosystem Integration** - Export rules to Pandera and Great Expectations
 - **Configuration Management** - Environment-based configuration with `.env` file support
+- **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration
+- **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling reports
+- **Statistical Testing** - Kolmogorov-Smirnov and chi-square tests for drift detection
 
 ## Quick Start
 
@@ -55,8 +58,11 @@ pip install lavendertown[great_expectations]
 pip install lavendertown[cli]
 
 # ML and time-series features
-pip install lavendertown[ml]
-pip install lavendertown[timeseries]
+pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML algorithms
+pip install lavendertown[timeseries]  # Ruptures for change point detection
+pip install lavendertown[profiling]   # ydata-profiling for comprehensive reports
+pip install lavendertown[parquet]     # PyArrow for Parquet export
+pip install lavendertown[stats]       # scipy.stats for statistical tests
 
 # All optional dependencies
 pip install lavendertown[all]

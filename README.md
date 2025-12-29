@@ -15,13 +15,17 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - 📊 **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit
 - 🎯 **Interactive ghost detection** - Drill down into problematic rows
 - 🐼 **Pandas & Polars support** - Works with your existing data pipelines
-- 📤 **Exportable findings** - Download results as JSON or CSV with one click
+- 📤 **Exportable findings** - Download results as JSON, CSV, or Parquet with one click
 - 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets
 - ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI
 - 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
-- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation
+- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation (Click and Typer support)
 - 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations
 - ⚙️ **Configuration Management** - Environment-based configuration with `.env` file support
+- 🤖 **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration
+- 📈 **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling with ydata-profiling
+- 📊 **Statistical Tests** - Kolmogorov-Smirnov and chi-square tests for rigorous drift detection
+- 💾 **Parquet Export** - Efficient columnar storage format for large datasets
 
 ## 📦 Installation
 
@@ -44,7 +48,22 @@ pip install lavendertown[pandera]
 pip install lavendertown[great_expectations]
 ```
 
+For Phase 6 features (ML algorithms, time-series, profiling, Parquet export):
+
+```bash
+pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML anomaly detection algorithms
+pip install lavendertown[timeseries]  # Ruptures for change point detection
+pip install lavendertown[profiling]   # ydata-profiling for comprehensive data profiling reports
+pip install lavendertown[parquet]     # PyArrow for Parquet export/import
+pip install lavendertown[stats]       # scipy.stats for statistical tests in drift detection
+```
+
 **Note:** LavenderTown is compatible with both altair 4.x and 5.x. Installing Great Expectations will automatically install altair 4.x (which is compatible with LavenderTown).
+
+For all Phase 6 features, install with:
+```bash
+pip install lavendertown[ml,timeseries,profiling,parquet,stats]
+```
 
 ## 🚀 Quick Start
 
@@ -194,7 +213,9 @@ lavendertown export-rules rules.json --format great_expectations --output-file s
 pip install lavendertown[cli]
 ```
 
-This includes Rich for beautiful terminal output, python-dotenv for configuration management, and orjson for faster JSON processing.
+This includes Rich for beautiful terminal output, python-dotenv for configuration management, orjson for faster JSON processing, and Typer for modern type-hint based CLI commands.
+
+**New in Phase 6:** LavenderTown now supports Parquet export format and includes a modern Typer-based CLI (available alongside the existing Click CLI). Install `lavendertown[parquet]` for Parquet support.
 
 **Example CLI Usage:**
 
@@ -299,7 +320,7 @@ LavenderTown is built with a plugin-based architecture:
   - `OutlierGhostDetector`: Finds statistical outliers using IQR method
   - `RuleBasedDetector`: Executes custom user-defined rules
 - **UI Components**: Streamlit-native visualization components
-- **Export Layer**: Fast JSON and CSV export functionality (with orjson optimization)
+- **Export Layer**: Fast JSON, CSV, and Parquet export functionality (with orjson optimization and PyArrow support)
 
 ## ⚙️ Configuration
 

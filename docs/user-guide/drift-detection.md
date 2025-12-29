@@ -85,6 +85,12 @@ Detects:
 - Cardinality changes
 - Value distribution shifts
 
+**Statistical Tests (Phase 6):**
+When `lavendertown[stats]` is installed, distribution comparison includes:
+- **Kolmogorov-Smirnov test** for numeric columns (tests if distributions differ)
+- **Chi-square test** for categorical columns (tests independence/contingency)
+- Test statistics and p-values are included in finding metadata
+
 ## Working with Drift Findings
 
 Drift findings are `GhostFinding` objects with `ghost_type="drift"`:
@@ -108,6 +114,9 @@ Drift findings include metadata:
 - `drift_type`: Category ("schema" or "distribution")
 - `baseline_value`: Value in baseline dataset
 - `current_value`: Value in current dataset
+- `ks_statistic`: Kolmogorov-Smirnov test statistic (numeric columns, Phase 6)
+- `p_value`: Statistical test p-value (Phase 6)
+- `chi2_statistic`: Chi-square test statistic (categorical columns, Phase 6)
 
 ## Example Output
 
@@ -133,8 +142,10 @@ lavendertown compare baseline.csv current.csv --output-format json
 
 Options:
 - `--comparison-type [full|schema_only|distribution_only]`: Type of comparison
-- `--output-format [json|csv]`: Output format
+- `--output-format [json|csv|parquet]`: Output format (Phase 6: Parquet support)
 - `--output-file PATH`: Specific output file
+
+**Note:** Parquet export requires `lavendertown[parquet]` (`pip install lavendertown[parquet]`)
 
 ## Use Cases
 

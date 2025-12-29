@@ -94,6 +94,7 @@ nav:
     - ML Anomaly Detection: user-guide/ml-anomaly-detection.md
     - Collaboration: user-guide/collaboration.md
     - CLI: user-guide/cli.md
+    - Data Profiling: user-guide/profiling.md
   - API Reference:
     - Inspector: api-reference/inspector.md
     - Models: api-reference/models.md
@@ -105,6 +106,7 @@ nav:
       - Outlier: api-reference/detectors/outlier.md
       - Time-Series: api-reference/detectors/timeseries.md
       - ML Anomaly: api-reference/detectors/ml_anomaly.md
+      - Change Point: api-reference/detectors/changepoint.md
     - Rules:
       - Base: api-reference/rules/base.md
       - Executors: api-reference/rules/executors.md
@@ -112,6 +114,7 @@ nav:
     - Export:
       - Pandera: api-reference/export/pandera.md
       - Great Expectations: api-reference/export/great_expectations.md
+      - Parquet: api-reference/export/parquet.md
     - Collaboration:
       - API: api-reference/collaboration/api.md
       - Models: api-reference/collaboration/models.md

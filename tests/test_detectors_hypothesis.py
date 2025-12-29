@@ -17,7 +17,7 @@ from hypothesis import assume, given, settings, HealthCheck
 try:
     import polars as pl
 except ImportError:
-    pl = None
+    pl = None  # type: ignore[assignment,misc]
 
 from lavendertown.detectors.null import NullGhostDetector
 from lavendertown.detectors.outlier import OutlierGhostDetector
@@ -79,11 +79,11 @@ def dataframe_strategy(draw: st.DrawFn) -> pd.DataFrame:
             )
         elif col_type == "string":
             col_data = draw(
-                st.lists(string_strategy(), min_size=n_rows, max_size=n_rows)
+                st.lists(string_strategy(), min_size=n_rows, max_size=n_rows)  # type: ignore[arg-type]
             )
         elif col_type == "datetime":
             col_data = draw(
-                st.lists(datetime_strategy(), min_size=n_rows, max_size=n_rows)
+                st.lists(datetime_strategy(), min_size=n_rows, max_size=n_rows)  # type: ignore[arg-type]
             )
         else:  # mixed
             col_data = draw(

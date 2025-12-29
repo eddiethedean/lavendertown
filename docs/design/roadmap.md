@@ -46,11 +46,12 @@ Based on research recommendations (see `docs/RESEARCH_PYTHON_PACKAGES.md`):
 - Hypothesis property-based testing
 - python-dotenv configuration
 
-## Phase 6 — Feature Enhancements 🔄 PLANNED
+## Phase 6 — Feature Enhancements ✅ COMPLETE
 
 - Typer CLI framework migration
-- PyOD anomaly detection
+- PyOD anomaly detection (40+ ML algorithms)
 - Ruptures change point detection
+- scipy.stats statistical tests for drift detection
 - PyArrow Parquet export
 - Faker test data generation
 - ydata-profiling integration

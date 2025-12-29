@@ -49,8 +49,36 @@ This includes:
 For machine learning-based anomaly detection and time-series analysis:
 
 ```bash
-pip install lavendertown[ml]          # scikit-learn for ML anomaly detection
-pip install lavendertown[timeseries]  # statsmodels for time-series analysis
+pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML anomaly detection algorithms
+pip install lavendertown[timeseries]  # Ruptures for change point detection + statsmodels for time-series analysis
+```
+
+**Phase 6 Features:**
+- **ML (`lavendertown[ml]`)**: Includes PyOD library with 40+ additional ML anomaly detection algorithms (ABOD, CBLOF, HBOS, KNN, MCD, PCA, and more) beyond scikit-learn's Isolation Forest, LOF, and One-Class SVM
+- **Time-Series (`lavendertown[timeseries]`)**: Includes Ruptures library for change point detection in time-series data
+
+### Data Profiling
+
+Generate comprehensive HTML profiling reports:
+
+```bash
+pip install lavendertown[profiling]   # ydata-profiling for advanced data profiling
+```
+
+### Parquet Export
+
+Export findings to efficient Parquet format:
+
+```bash
+pip install lavendertown[parquet]     # PyArrow for Parquet export/import
+```
+
+### Statistical Tests
+
+Enhanced drift detection with statistical tests:
+
+```bash
+pip install lavendertown[stats]       # scipy.stats for Kolmogorov-Smirnov and chi-square tests
 ```
 
 ### All Optional Dependencies
@@ -64,9 +92,12 @@ pip install lavendertown[all]
 This includes:
 - Polars support
 - Pandera and Great Expectations exports
-- Enhanced CLI (Rich, python-dotenv, orjson)
-- ML anomaly detection (scikit-learn)
-- Time-series analysis (statsmodels)
+- Enhanced CLI (Rich, python-dotenv, orjson, Typer)
+- ML anomaly detection (PyOD + scikit-learn)
+- Time-series analysis (Ruptures + statsmodels)
+- Data profiling (ydata-profiling)
+- Parquet export (PyArrow)
+- Statistical tests (scipy.stats)
 
 ## Development Installation
 
