@@ -38,7 +38,7 @@ def create_test_dataframe(rows: int, columns: int = 10) -> pd.DataFrame:
     return pd.DataFrame(data)
 
 
-def benchmark_detection(df: pd.DataFrame) -> dict[str, float]:
+def benchmark_detection(df: pd.DataFrame) -> dict[str, float | str | int]:
     """Benchmark detection performance.
 
     Args:
@@ -109,14 +109,11 @@ def run_benchmarks() -> None:
     if results:
         for result in results:
             if result["num_rows"] == 100_000:
-                if result["detection_time_seconds"] < 2.0:
-                    print(
-                        f"✓ 100k rows: {result['detection_time_seconds']:.3f}s (target met!)"
-                    )
+                detection_time = float(result["detection_time_seconds"])
+                if detection_time < 2.0:
+                    print(f"✓ 100k rows: {detection_time:.3f}s (target met!)")
                 else:
-                    print(
-                        f"✗ 100k rows: {result['detection_time_seconds']:.3f}s (target: <2s)"
-                    )
+                    print(f"✗ 100k rows: {detection_time:.3f}s (target: <2s)")
 
 
 if __name__ == "__main__":

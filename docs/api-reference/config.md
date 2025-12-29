@@ -12,8 +12,6 @@ LavenderTown automatically loads configuration from `.env` files when the packag
 
 ## Functions
 
-::: lavendertown.config.load_config
-
 ::: lavendertown.config.get_config
 
 ::: lavendertown.config.get_config_bool

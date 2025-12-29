@@ -50,8 +50,8 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - admonition
   - pymdownx.tasklist:
       custom_checkbox: true
@@ -99,6 +99,7 @@ nav:
     - Inspector: api-reference/inspector.md
     - Models: api-reference/models.md
     - Configuration: api-reference/config.md
+    - Upload Component: api-reference/upload.md
     - Detectors:
       - Base: api-reference/detectors/base.md
       - Null: api-reference/detectors/null.md
@@ -106,7 +107,6 @@ nav:
       - Outlier: api-reference/detectors/outlier.md
       - Time-Series: api-reference/detectors/timeseries.md
       - ML Anomaly: api-reference/detectors/ml_anomaly.md
-      - Change Point: api-reference/detectors/changepoint.md
     - Rules:
       - Base: api-reference/rules/base.md
       - Executors: api-reference/rules/executors.md
@@ -114,7 +114,6 @@ nav:
     - Export:
       - Pandera: api-reference/export/pandera.md
       - Great Expectations: api-reference/export/great_expectations.md
-      - Parquet: api-reference/export/parquet.md
     - Collaboration:
       - API: api-reference/collaboration/api.md
       - Models: api-reference/collaboration/models.md

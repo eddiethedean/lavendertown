@@ -61,8 +61,8 @@ ruleset = RuleSet(
 )
 
 # Rule 1: Subtotal should equal quantity * unit_price
-ruleset.add_rule(
-    CrossColumnRule(
+ruleset.add_rule(  # type: ignore[arg-type]
+    CrossColumnRule(  # type: ignore[arg-type]
         name="subtotal_check",
         description="Subtotal must equal quantity * unit_price",
         source_columns=["quantity", "unit_price"],
@@ -72,8 +72,8 @@ ruleset.add_rule(
 )
 
 # Rule 2: Total should be less than or equal to subtotal (after discount)
-ruleset.add_rule(
-    CrossColumnRule(
+ruleset.add_rule(  # type: ignore[arg-type]
+    CrossColumnRule(  # type: ignore[arg-type]
         name="total_check",
         description="Total should be less than or equal to subtotal",
         source_columns=["total", "subtotal"],
@@ -84,8 +84,8 @@ ruleset.add_rule(
 # Rule 3: If status is "completed", payment_date should be set
 # Note: Conditional rules check if-then logic. For null checks, we'd need
 # a different approach or custom rule. This example shows the pattern.
-ruleset.add_rule(
-    CrossColumnRule(
+ruleset.add_rule(  # type: ignore[arg-type]
+    CrossColumnRule(  # type: ignore[arg-type]
         name="payment_date_check",
         description="If status is 'completed', payment_date must be set",
         source_columns=["status", "payment_date"],
@@ -100,8 +100,8 @@ ruleset.add_rule(
 )
 
 # Rule 4: Category must exist in valid_categories (referential integrity)
-ruleset.add_rule(
-    CrossColumnRule(
+ruleset.add_rule(  # type: ignore[arg-type]
+    CrossColumnRule(  # type: ignore[arg-type]
         name="category_referential",
         description="Category values must exist in valid_categories",
         source_columns=["category"],
@@ -113,14 +113,18 @@ ruleset.add_rule(
 # Display rules
 st.markdown("### Defined Rules")
 for rule in ruleset.rules:
-    with st.expander(f"Rule: {rule.name}"):
-        st.write(f"**Description:** {rule.description}")
-        st.write(f"**Operation:** {rule.operation}")
-        st.write(f"**Source Columns:** {', '.join(rule.source_columns)}")
-        if rule.target_column:
-            st.write(f"**Target Column:** {rule.target_column}")
-        if rule.condition:
-            st.write(f"**Condition:** {rule.condition}")
+    # Type cast to CrossColumnRule for attribute access
+    from typing import cast
+
+    cross_rule = cast(CrossColumnRule, rule)
+    with st.expander(f"Rule: {cross_rule.name}"):
+        st.write(f"**Description:** {cross_rule.description}")
+        st.write(f"**Operation:** {cross_rule.operation}")
+        st.write(f"**Source Columns:** {', '.join(cross_rule.source_columns)}")
+        if cross_rule.target_column:
+            st.write(f"**Target Column:** {cross_rule.target_column}")
+        if cross_rule.condition:
+            st.write(f"**Condition:** {cross_rule.condition}")
 
 # Create inspector with ruleset
 st.subheader("Validation Results")
@@ -130,7 +134,7 @@ inspector.render()
 # Execute rules
 st.markdown("### Cross-Column Rule Validation")
 
-rule_detector = RuleBasedDetector(ruleset)
+rule_detector = RuleBasedDetector(ruleset)  # type: ignore[arg-type]
 rule_findings = rule_detector.detect(df)
 
 if rule_findings:

@@ -42,7 +42,7 @@ if uploaded_file is not None:
 Streamlit Cloud can automatically detect dependencies from `pyproject.toml` if your project uses it. However, you can also create a `requirements.txt` file in your repository root:
 
 ```txt
-lavendertown>=0.5.0
+lavendertown>=0.6.0
 pandas>=1.5.0
 streamlit>=1.28.0
 altair>=5.0.0

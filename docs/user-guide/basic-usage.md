@@ -107,6 +107,41 @@ df_polars = pl.DataFrame({"value": [1, 2, 3]})
 inspector = Inspector(df_polars)  # Automatically uses Polars backend
 ```
 
+## File Upload Component
+
+LavenderTown includes an enhanced file upload component for Streamlit applications with drag-and-drop support, animated progress indicators, and automatic encoding detection.
+
+### Using the Upload Component
+
+```python
+import streamlit as st
+from lavendertown.ui.upload import render_file_upload
+from lavendertown import Inspector
+
+# Upload file with enhanced UI
+uploaded_file, df, encoding_used = render_file_upload(st)
+
+if uploaded_file is not None:
+    if df is not None:
+        st.success(f"File loaded with {encoding_used} encoding")
+        
+        # Use with Inspector
+        inspector = Inspector(df)
+        inspector.render()
+    else:
+        st.error("Could not read the uploaded file")
+```
+
+### Features
+
+- **Drag-and-drop interface**: Enhanced styling for intuitive file uploads
+- **Animated progress**: Multi-stage progress indicators for visual feedback
+- **Automatic encoding detection**: Tries UTF-8, Latin-1, ISO-8859-1, and CP1252
+- **File validation**: Clear error messages for invalid files
+- **File size warnings**: Alerts for large files (>10MB)
+
+See the [Upload Component API Reference](../api-reference/upload.md) for detailed documentation.
+
 ## Configuration
 
 LavenderTown supports configuration through environment variables and `.env` files. Configuration is automatically loaded when the package is imported.

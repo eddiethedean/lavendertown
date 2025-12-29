@@ -23,7 +23,60 @@ Save this as `app.py` and run `streamlit run app.py` to see the interactive dash
 
 ## Common Usage Patterns
 
-### Pattern 1: Automated Data Quality Checks
+### Pattern 1: Enhanced File Upload with Automatic Encoding Detection
+
+Use the enhanced file upload component for a polished user experience:
+
+```python
+import streamlit as st
+from lavendertown import Inspector
+from lavendertown.ui.upload import render_file_upload
+
+st.title("Data Quality Inspector")
+
+# Upload file with enhanced UI
+uploaded_file, df, encoding_used = render_file_upload(
+    st,
+    accepted_types=[".csv"],
+    help_text="Upload a CSV file to analyze for data quality issues",
+    show_file_info=True
+)
+
+if uploaded_file is not None:
+    if df is None:
+        st.error("Could not read the CSV file. Please check the file format.")
+        st.stop()
+    
+    # Show success message
+    st.success(f"✅ File loaded successfully (encoding: {encoding_used})")
+    
+    # Display dataset preview
+    st.header("Dataset Preview")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Rows", f"{len(df):,}")
+    with col2:
+        st.metric("Columns", len(df.columns))
+    with col3:
+        st.metric("Memory", f"{df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB")
+    
+    # Run inspection
+    inspector = Inspector(df)
+    inspector.render()
+else:
+    st.info("👆 Please upload a CSV file to get started.")
+```
+
+**Features:**
+- Drag-and-drop interface with enhanced styling
+- Animated progress indicators
+- Automatic encoding detection (UTF-8, Latin-1, ISO-8859-1, CP1252)
+- File size validation and warnings
+- Clear error messages
+
+See the [Upload Component API Reference](../api-reference/upload.md) for detailed documentation.
+
+### Pattern 2: Automated Data Quality Checks
 
 For CI/CD pipelines or scheduled jobs:
 

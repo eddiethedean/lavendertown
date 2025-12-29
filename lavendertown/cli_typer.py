@@ -190,8 +190,8 @@ if _TYPER_AVAILABLE:
                 except ImportError:
                     if _console:
                         _console.print(
-                        "[red]Error:[/red] PyArrow required. "
-                        "Install with: pip install lavendertown[parquet]"
+                            "[red]Error:[/red] PyArrow required. "
+                            "Install with: pip install lavendertown[parquet]"
                         )
                     sys.exit(1)
             else:

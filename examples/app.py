@@ -1,9 +1,12 @@
 """LavenderTown Streamlit App - CSV Upload and Data Quality Inspection."""
 
+from typing import cast
+
 import pandas as pd
 import streamlit as st
 
 from lavendertown import Inspector
+from lavendertown.ui.upload import render_file_upload
 
 st.set_page_config(
     page_title="LavenderTown - Data Quality Inspector",
@@ -15,51 +18,27 @@ st.set_page_config(
 st.title("👻 LavenderTown - Data Quality Inspector")
 st.markdown("Upload a CSV file to detect and visualize data quality issues (ghosts).")
 
-# File upload section
+# File upload section with dropzone and animations
 st.header("📤 Upload CSV File")
 
-uploaded_file = st.file_uploader(
-    "Choose a CSV file",
-    type=["csv"],
-    help="Upload a CSV file to analyze for data quality issues",
+uploaded_file, df, encoding_used = render_file_upload(
+    st,
+    accepted_types=[".csv"],
+    help_text="Upload a CSV file to analyze for data quality issues",
+    show_file_info=True,
 )
 
 if uploaded_file is not None:
-    # Display file info
-    file_size = len(uploaded_file.getvalue())
-    st.info(f"📄 File: `{uploaded_file.name}` ({file_size:,} bytes)")
+    if df is None:
+        # File was uploaded but couldn't be read (error already shown by render_file_upload)
+        st.stop()
 
-    # File size warning for very large files
-    if file_size > 10_000_000:  # 10 MB
-        st.warning(
-            "⚠️ Large file detected. Processing may take longer. "
-            "Consider sampling for faster analysis."
-        )
+    # Type cast: df is guaranteed to be a pandas DataFrame at this point
+    df = cast(pd.DataFrame, df)
 
     try:
-        # Try to read the CSV file
-        with st.spinner("Reading CSV file..."):
-            # Attempt multiple encodings
-            encodings = ["utf-8", "latin-1", "iso-8859-1", "cp1252"]
-            df = None
-            encoding_used = None
-
-            for encoding in encodings:
-                try:
-                    uploaded_file.seek(0)  # Reset file pointer
-                    df = pd.read_csv(uploaded_file, encoding=encoding)
-                    encoding_used = encoding
-                    break
-                except (UnicodeDecodeError, pd.errors.ParserError):
-                    continue
-
-            if df is None:
-                st.error(
-                    "❌ Could not read CSV file. Please check the file format and encoding."
-                )
-                st.stop()
-
-            st.success(f"✅ File read successfully (encoding: {encoding_used})")
+        # Show encoding success message
+        st.success(f"✅ File read successfully (encoding: {encoding_used})")
 
         # Display basic info about the dataset
         st.header("📊 Dataset Preview")

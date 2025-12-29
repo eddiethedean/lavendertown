@@ -13,10 +13,14 @@ streamlit run examples/app.py
 ```
 
 This app allows you to:
-- Upload CSV files via drag-and-drop
+- Upload CSV files via drag-and-drop with enhanced UI
+- See animated progress indicators during file processing
+- Automatic encoding detection (UTF-8, Latin-1, ISO-8859-1, CP1252)
 - Preview your data
 - Analyze data quality interactively
 - Export findings as JSON or CSV
+
+**New in v0.6.0:** The upload component includes polished animations, automatic encoding detection, and enhanced visual feedback.
 
 ## Example Scripts
 

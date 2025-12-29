@@ -18,6 +18,7 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - 📤 **Exportable findings** - Download results as JSON, CSV, or Parquet with one click
 - 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets
 - ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI
+- 📁 **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection
 - 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
 - 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation (Click and Typer support)
 - 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations
@@ -110,10 +111,14 @@ streamlit run examples/app.py
 ```
 
 This opens a web interface where you can:
-- Upload CSV files via drag-and-drop or file browser
+- Upload CSV files via drag-and-drop or file browser with enhanced UI
+- See animated progress indicators during file processing
+- Automatic encoding detection (UTF-8, Latin-1, ISO-8859-1, CP1252)
 - Preview your data before analysis
 - View interactive data quality insights
 - Export findings with download buttons
+
+**New in v0.6.0:** The upload experience includes polished animations, automatic encoding detection, and enhanced visual feedback for a professional user experience.
 
 See the [examples directory](https://github.com/eddiethedean/lavendertown/tree/main/examples) and [examples/README.md](https://github.com/eddiethedean/lavendertown/blob/main/examples/README.md) for more usage examples and detailed instructions.
 

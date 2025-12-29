@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lavendertown"
-version = "0.5.0"
+version = "0.6.0"
 description = "A Streamlit-first Python package for detecting and visualizing data quality issues"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "streamlit>=1.28.0",
+    "streamlit>=1.52.0",
     "pandas>=1.5.0",
     "altair>=4.2.1",
     "click>=8.0.0",

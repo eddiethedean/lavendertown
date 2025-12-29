@@ -6,6 +6,7 @@ without the Streamlit UI, useful for scripts and automated workflows.
 
 import pandas as pd
 from lavendertown import Inspector
+from lavendertown.models import GhostFinding
 
 # Create sample data
 data = {
@@ -28,7 +29,7 @@ print("=" * 60)
 findings = inspector.detect()
 
 # Group findings by severity
-by_severity = {}
+by_severity: dict[str, list[GhostFinding]] = {}
 for finding in findings:
     severity = finding.severity
     if severity not in by_severity:

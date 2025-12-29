@@ -13,6 +13,7 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **Exportable findings** - Download results as JSON, CSV, or Parquet with one click
 - **Dataset Comparison** - Detect schema and distribution drift between datasets with statistical tests
 - **Custom Rules** - Create and manage custom data quality rules via UI
+- **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection
 - **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
 - **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer)
 - **Ecosystem Integration** - Export rules to Pandera and Great Expectations
