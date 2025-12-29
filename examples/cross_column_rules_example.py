@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from lavendertown import Inspector
+from lavendertown.detectors.rule_based import RuleBasedDetector
 from lavendertown.rules.cross_column import CrossColumnRule
 from lavendertown.rules.models import RuleSet
 
@@ -55,7 +56,9 @@ st.dataframe(df)
 # Create cross-column rules
 st.subheader("Cross-Column Rules")
 
-ruleset = RuleSet(name="cross_column_example", description="Cross-column validation rules")
+ruleset = RuleSet(
+    name="cross_column_example", description="Cross-column validation rules"
+)
 
 # Rule 1: Subtotal should equal quantity * unit_price
 ruleset.add_rule(
@@ -126,7 +129,6 @@ inspector.render()
 
 # Execute rules
 st.markdown("### Cross-Column Rule Validation")
-from lavendertown.detectors.rule_based import RuleBasedDetector
 
 rule_detector = RuleBasedDetector(ruleset)
 rule_findings = rule_detector.detect(df)
@@ -145,4 +147,3 @@ st.info(
     "and data relationships. Use them to ensure data consistency across "
     "multiple columns."
 )
-

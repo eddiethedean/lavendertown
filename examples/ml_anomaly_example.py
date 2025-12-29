@@ -37,9 +37,57 @@ st.markdown(
 # Create sample data with anomalies
 data = {
     "feature1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50, 2, 3, 4, 5],  # 50 is an anomaly
-    "feature2": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 100, 12, 13, 14],  # 100 is an anomaly
-    "feature3": [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 200, 103, 104],  # 200 is an anomaly
-    "category": ["A", "B", "A", "B", "A", "B", "A", "B", "A", "B", "A", "B", "A", "B", "A"],
+    "feature2": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        100,
+        12,
+        13,
+        14,
+    ],  # 100 is an anomaly
+    "feature3": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        200,
+        103,
+        104,
+    ],  # 200 is an anomaly
+    "category": [
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+    ],
 }
 
 df = pd.DataFrame(data)
@@ -94,4 +142,3 @@ st.info(
     "anomalies that may not be obvious with statistical methods. It works well "
     "with multi-dimensional data and can detect subtle patterns."
 )
-

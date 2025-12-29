@@ -48,21 +48,19 @@ findings = inspector.detect()
 
 if findings:
     st.markdown(f"### Found {len(findings)} Issues")
-    
+
     # Collaboration features
     st.markdown("---")
     st.subheader("Collaboration Features")
-    
+
     # Select a finding to annotate
-    finding_options = {
-        f"{f.column} - {f.description[:50]}...": f for f in findings
-    }
+    finding_options = {f"{f.column} - {f.description[:50]}...": f for f in findings}
     selected_finding_label = st.selectbox(
         "Select a finding to annotate",
         options=list(finding_options.keys()),
     )
     selected_finding = finding_options[selected_finding_label]
-    
+
     # Annotation form
     with st.expander("Add Annotation", expanded=True):
         author = st.text_input("Author", value="Data Team")
@@ -74,7 +72,7 @@ if findings:
             "Status",
             [None, "reviewed", "fixed", "false_positive", "needs-investigation"],
         )
-        
+
         if st.button("Add Annotation"):
             if comment:
                 tag_list = [t.strip() for t in tags.split(",") if t.strip()]
@@ -89,11 +87,11 @@ if findings:
                 st.json(annotation.to_dict())
             else:
                 st.error("Please enter a comment")
-    
+
     # View annotations
     st.markdown("### Existing Annotations")
     annotations = get_annotations(selected_finding)
-    
+
     if annotations:
         for ann in annotations:
             with st.expander(
@@ -106,21 +104,21 @@ if findings:
                     st.write(f"**Status:** {ann.status}")
     else:
         st.info("No annotations yet. Add one above!")
-    
+
     # Create shareable report
     st.markdown("---")
     st.subheader("Create Shareable Report")
-    
+
     report_title = st.text_input("Report Title", value="Data Quality Report")
     report_author = st.text_input("Report Author", value="Data Team")
-    
+
     if st.button("Create Shareable Report"):
         # Get all annotations for all findings
         all_annotations = []
         for finding in findings:
             anns = get_annotations(finding)
             all_annotations.extend(anns)
-        
+
         report = create_shareable_report(
             title=report_title,
             author=report_author,
@@ -128,11 +126,11 @@ if findings:
             annotations=all_annotations if all_annotations else None,
         )
         st.success(f"✅ Report created: {report.id}")
-        
+
         # Export report
         report_path = export_report(report)
         st.info(f"📄 Report saved to: {report_path}")
-        
+
         # Show report details
         with st.expander("View Report Details"):
             st.write(f"**Title:** {report.title}")
@@ -141,29 +139,29 @@ if findings:
             st.write(f"**Findings:** {len(report.findings)}")
             st.write(f"**Annotations:** {len(report.annotations)}")
             st.json(report.to_dict())
-    
+
     # Import report
     st.markdown("---")
     st.subheader("Import Shareable Report")
-    
+
     report_file = st.file_uploader(
         "Upload a report file (.json)",
         type=["json"],
         help="Upload a previously exported report file",
     )
-    
+
     if report_file:
         import tempfile
         import json
-        
+
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
             json.dump(json.load(report_file), f)
             temp_path = f.name
-        
+
         try:
             imported_report = import_report(temp_path)
             st.success(f"✅ Report imported: {imported_report.title}")
-            
+
             with st.expander("View Imported Report"):
                 st.write(f"**Title:** {imported_report.title}")
                 st.write(f"**Author:** {imported_report.author}")
@@ -180,4 +178,3 @@ st.info(
     "issues. Use annotations to discuss findings and shareable reports to "
     "communicate results with stakeholders."
 )
-

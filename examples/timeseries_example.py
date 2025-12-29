@@ -101,4 +101,3 @@ st.info(
     "over time, detecting sudden changes, and identifying unusual patterns in "
     "temporal data."
 )
-
