@@ -180,9 +180,128 @@ max_rows = get_config_int("LAVENDERTOWN_MAX_ROWS", 1000000)
 
 Configuration is automatically loaded when you import LavenderTown, so no additional setup is required.
 
+## Modular UI Components
+
+!!! info "Version"
+    This feature was introduced in **v0.7.0**.
+
+LavenderTown now supports a modular UI component system that allows you to customize the Inspector interface. You can enable/disable components, reorder them, or create completely custom layouts.
+
+### Using Custom UI Layouts
+
+```python
+from lavendertown import Inspector
+from lavendertown.ui.layout import ComponentLayout, create_default_layout
+from lavendertown.ui.base import ComponentWrapper
+from lavendertown.ui.overview import render_overview
+from lavendertown.ui.charts import render_charts
+
+# Create a minimal layout with only overview and charts
+custom_layout = ComponentLayout(
+    components=[
+        ComponentWrapper(
+            name="overview",
+            render_func=render_overview,
+            order=10,
+            requires_findings=True,
+        ),
+        ComponentWrapper(
+            name="charts",
+            render_func=render_charts,
+            order=20,
+            requires_df=True,
+            requires_findings=True,
+            requires_backend=True,
+        ),
+    ]
+)
+
+inspector = Inspector(df, ui_layout=custom_layout)
+inspector.render()
+```
+
+### Disabling Components
+
+```python
+# Start with default layout and disable components
+layout = create_default_layout()
+layout.disable_component("sidebar")
+layout.disable_component("rule_management")
+
+inspector = Inspector(df, ui_layout=layout)
+inspector.render()
+```
+
+See the [Modular UI Components Guide](../guides/modular-ui-components.md) for detailed documentation.
+
+## Interactive Visualizations with Plotly
+
+!!! info "Version"
+    This feature was introduced in **v0.7.0**.
+
+LavenderTown now supports Plotly as an optional visualization backend for interactive charts with zoom, pan, and 3D visualizations.
+
+### Installing Plotly Support
+
+```bash
+pip install lavendertown[plotly]
+```
+
+### Using Plotly Backend
+
+The visualization backend can be selected in the UI when viewing charts. Plotly provides:
+- Interactive time-series charts with zoom and pan
+- 3D scatter plots for multi-dimensional outlier visualization
+- Enhanced bar charts for ghost type distribution
+- Heatmaps for correlation analysis
+
+## Enhanced UI Components
+
+!!! info "Version"
+    This feature was introduced in **v0.7.0**.
+
+LavenderTown integrates with Streamlit Extras for enhanced UI components including metric cards, badges, and improved layouts.
+
+### Installing Streamlit Extras
+
+```bash
+pip install lavendertown[ui]
+```
+
+The enhanced components automatically fall back to standard Streamlit components if Streamlit Extras is not installed.
+
+## Database Backend for Collaboration
+
+!!! info "Version"
+    This feature was introduced in **v0.7.0**.
+
+LavenderTown now supports SQLAlchemy-based database storage for collaboration features, enabling multi-user scenarios and scalable report storage.
+
+### Installing Database Support
+
+```bash
+pip install lavendertown[database]
+```
+
+### Configuring Database Backend
+
+Set environment variables to use database storage:
+
+```bash
+LAVENDERTOWN_STORAGE_TYPE=database
+LAVENDERTOWN_DATABASE_URL=postgresql://user:pass@localhost/lavendertown
+```
+
+For SQLite (default):
+```bash
+LAVENDERTOWN_STORAGE_TYPE=database
+# Uses SQLite in .lavendertown/lavendertown.db by default
+```
+
 ## Next Steps
 
 - Learn about [Detectors](detectors.md) for different detection methods
 - Explore [Custom Rules](custom-rules.md) for domain-specific validation
 - Check out [Drift Detection](drift-detection.md) for dataset comparison
+- See [Modular UI Components](../guides/modular-ui-components.md) for customizing the interface
 

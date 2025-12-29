@@ -50,12 +50,15 @@ For machine learning-based anomaly detection and time-series analysis:
 
 ```bash
 pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML anomaly detection algorithms
-pip install lavendertown[timeseries]  # Ruptures for change point detection + statsmodels for time-series analysis
+pip install lavendertown[timeseries]  # Ruptures + statsmodels + tsfresh for time-series analysis
 ```
 
 **Phase 6 Features:**
 - **ML (`lavendertown[ml]`)**: Includes PyOD library with 40+ additional ML anomaly detection algorithms (ABOD, CBLOF, HBOS, KNN, MCD, PCA, and more) beyond scikit-learn's Isolation Forest, LOF, and One-Class SVM
 - **Time-Series (`lavendertown[timeseries]`)**: Includes Ruptures library for change point detection in time-series data
+
+**Phase 7 Features (v0.7.0):**
+- **Time-Series (`lavendertown[timeseries]`)**: Now also includes tsfresh for advanced time-series feature extraction (700+ features)
 
 ### Data Profiling
 
@@ -81,6 +84,21 @@ Enhanced drift detection with statistical tests:
 pip install lavendertown[stats]       # scipy.stats for Kolmogorov-Smirnov and chi-square tests
 ```
 
+### Phase 7 Features (v0.7.0)
+
+Advanced integrations for enhanced visualizations, UI components, and database storage:
+
+```bash
+pip install lavendertown[plotly]      # Plotly for interactive visualizations (zoom, pan, 3D charts)
+pip install lavendertown[ui]           # Streamlit Extras for enhanced UI components (metric cards, badges)
+pip install lavendertown[database]     # SQLAlchemy for database backend (SQLite and PostgreSQL)
+```
+
+**Phase 7 Features:**
+- **Plotly (`lavendertown[plotly]`)**: Interactive visualization backend with zoom, pan, and 3D charts
+- **UI (`lavendertown[ui]`)**: Streamlit Extras integration for enhanced metric cards, badges, and improved layouts
+- **Database (`lavendertown[database]`)**: SQLAlchemy support for scalable collaboration features with SQLite and PostgreSQL
+
 ### All Optional Dependencies
 
 Install everything at once:
@@ -94,10 +112,13 @@ This includes:
 - Pandera and Great Expectations exports
 - Enhanced CLI (Rich, python-dotenv, orjson, Typer)
 - ML anomaly detection (PyOD + scikit-learn)
-- Time-series analysis (Ruptures + statsmodels)
+- Time-series analysis (Ruptures + statsmodels + tsfresh)
 - Data profiling (ydata-profiling)
 - Parquet export (PyArrow)
 - Statistical tests (scipy.stats)
+- Plotly interactive visualizations
+- Streamlit Extras UI components
+- SQLAlchemy database backend
 
 ## Development Installation
 

@@ -21,6 +21,64 @@ inspector.render()  # Must be called within Streamlit app context
 
 Save this as `app.py` and run `streamlit run app.py` to see the interactive dashboard.
 
+## v0.7.0 Features
+
+### Pattern: Custom UI Layout
+
+Create a minimal or custom UI layout:
+
+```python
+import streamlit as st
+from lavendertown import Inspector
+from lavendertown.ui.layout import ComponentLayout, create_default_layout
+from lavendertown.ui.base import ComponentWrapper
+from lavendertown.ui.overview import render_overview
+from lavendertown.ui.charts import render_charts
+import pandas as pd
+
+st.set_page_config(page_title="Custom Layout Demo", layout="wide")
+
+df = pd.DataFrame({
+    "col1": [1, 2, 3, None, 5],
+    "col2": ["A", "B", "A", "C", "B"],
+})
+
+# Create minimal layout (no sidebar, no export)
+layout = create_default_layout()
+layout.disable_component("sidebar")
+layout.disable_component("export_section")
+layout.disable_component("rule_management")
+
+inspector = Inspector(df, ui_layout=layout)
+inspector.render()
+```
+
+### Pattern: Interactive Plotly Visualizations
+
+Use Plotly for interactive charts:
+
+```python
+# Install: pip install lavendertown[plotly]
+# The UI will show a backend selector when Plotly is available
+# Users can switch between Altair and Plotly in the charts section
+```
+
+### Pattern: Database Backend for Collaboration
+
+Use SQLAlchemy for scalable storage:
+
+```python
+# Install: pip install lavendertown[database]
+# Configure via environment variables:
+# LAVENDERTOWN_STORAGE_TYPE=database
+# LAVENDERTOWN_DATABASE_URL=postgresql://user:pass@localhost/lavendertown
+
+from lavendertown.collaboration.database_storage import DatabaseStorage
+
+storage = DatabaseStorage(database_url="sqlite:///lavendertown.db")
+# Use storage.save_report(), storage.load_report(), etc.
+```
+
 ## Common Usage Patterns
 
 ### Pattern 1: Enhanced File Upload with Automatic Encoding Detection

@@ -1,6 +1,9 @@
 # Time-Series Anomaly Detection
 
 !!! info "Version"
+    Time-series anomaly detection was introduced in **v0.2.0**. Change point detection with Ruptures was added in **v0.5.0**. Advanced tsfresh features were added in **v0.7.0**.
+
+!!! info "Version"
     Time-series anomaly detection was introduced in **v0.2.0**. Change point detection with Ruptures was added in **v0.5.0**.
 
 LavenderTown includes specialized detectors for identifying anomalies in time-series data.
@@ -193,8 +196,43 @@ findings = inspector.detect()
 4. **Consider seasonality**: Use seasonal method for data with periodic patterns
 5. **Validate results**: Review detected anomalies to ensure they're meaningful
 
+## Advanced Feature Extraction (v0.7.0)
+
+LavenderTown integrates with tsfresh for advanced time-series feature extraction, enabling ML-based anomaly detection with 700+ extracted features.
+
+### Using tsfresh Features
+
+```python
+from lavendertown.detectors.timeseries import TimeSeriesAnomalyDetector
+
+# Enable tsfresh feature extraction
+detector = TimeSeriesAnomalyDetector(
+    datetime_column="timestamp",
+    use_tsfresh_features=True  # Enable advanced feature extraction
+)
+
+findings = detector.detect(df)
+```
+
+### Manual Feature Extraction
+
+```python
+from lavendertown.detectors.timeseries_features import extract_tsfresh_features
+
+# Extract 700+ time-series features
+features = extract_tsfresh_features(
+    df,
+    datetime_column="datetime",
+    value_column="value",
+    feature_selection=True  # Automatically select relevant features
+)
+```
+
+See the [Time-Series Features API Reference](../api-reference/timeseries_features.md) for detailed documentation.
+
 ## Next Steps
 
 - Learn about [ML Anomaly Detection](ml-anomaly-detection.md) for complex patterns
 - See [API Reference](../api-reference/detectors/timeseries.md) for detailed documentation
+- Explore [Time-Series Features](../api-reference/timeseries_features.md) for advanced feature extraction
 

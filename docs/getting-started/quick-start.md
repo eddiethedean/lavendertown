@@ -66,6 +66,12 @@ This opens a web interface where you can:
 
 **New in v0.6.0:** The upload experience includes polished animations, automatic encoding detection, and enhanced visual feedback.
 
+**New in v0.7.0:** 
+- Modular UI components for custom layouts
+- Plotly interactive visualizations (install with `pip install lavendertown[plotly]`)
+- Enhanced UI components with Streamlit Extras (install with `pip install lavendertown[ui]`)
+- Database backend for collaboration (install with `pip install lavendertown[database]`)
+
 ## Programmatic Usage
 
 Use LavenderTown in your Python scripts without Streamlit:

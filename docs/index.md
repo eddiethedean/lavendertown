@@ -17,6 +17,11 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **Dataset Comparison** - Detect schema and distribution drift between datasets with statistical tests *(v0.2.0, Statistical tests: v0.5.0)*
 - **Custom Rules** - Create and manage custom data quality rules via UI *(v0.2.0)*
 - **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection *(v0.6.0)*
+- **Modular UI Components** - Flexible component system for customizing the Inspector interface *(v0.7.0)*
+- **Interactive Visualizations** - Plotly backend for interactive charts with zoom, pan, and 3D visualizations *(v0.7.0)*
+- **Advanced Time-Series Features** - tsfresh integration for 700+ time-series features and ML-based anomaly detection *(v0.7.0)*
+- **Enhanced UI Components** - Streamlit Extras integration for improved metric cards, badges, and layouts *(v0.7.0)*
+- **Database Backend** - SQLAlchemy support for scalable collaboration features with SQLite and PostgreSQL *(v0.7.0)*
 - **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization *(orjson: v0.4.0)*
 - **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer) *(Click: v0.2.0, Rich: v0.4.0, Typer: v0.5.0)*
 - **Ecosystem Integration** - Export rules to Pandera and Great Expectations *(v0.2.0)*
@@ -63,10 +68,15 @@ pip install lavendertown[cli]
 
 # ML and time-series features
 pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML algorithms
-pip install lavendertown[timeseries]  # Ruptures for change point detection
+pip install lavendertown[timeseries]  # Ruptures + statsmodels + tsfresh for time-series analysis
 pip install lavendertown[profiling]   # ydata-profiling for comprehensive reports
 pip install lavendertown[parquet]     # PyArrow for Parquet export
 pip install lavendertown[stats]       # scipy.stats for statistical tests
+
+# Phase 7 features (v0.7.0)
+pip install lavendertown[plotly]      # Plotly for interactive visualizations
+pip install lavendertown[ui]          # Streamlit Extras for enhanced UI components
+pip install lavendertown[database]    # SQLAlchemy for database backend
 
 # All optional dependencies
 pip install lavendertown[all]

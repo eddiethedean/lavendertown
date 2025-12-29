@@ -35,6 +35,9 @@ def render_charts(
         st.info("No findings to visualize. Adjust filters to see charts.")
         return
 
+    # Visualization backend selection
+    viz_backend_name = _get_visualization_backend(st)
+
     # Group findings by column
     column_findings = {}
     for finding in filtered_findings:
@@ -53,8 +56,48 @@ def render_charts(
 
         if selected_column:
             _render_column_charts(
-                st, df, selected_column, column_findings[selected_column], backend
+                st,
+                df,
+                selected_column,
+                column_findings[selected_column],
+                backend,
+                viz_backend_name,
             )
+
+
+def _get_visualization_backend(st: object) -> str:
+    """Get the selected visualization backend.
+
+    Args:
+        st: Streamlit module
+
+    Returns:
+        Backend name ("altair" or "plotly")
+    """
+    from lavendertown.ui.visualizations.base import get_backend
+
+    # Check if Plotly is available
+    try:
+        plotly_backend = get_backend("plotly")
+        plotly_available = plotly_backend.is_available()
+    except (ImportError, ValueError):
+        plotly_available = False
+
+    # Default to Altair
+    default_backend = "altair"
+
+    # Show backend selector if Plotly is available
+    if plotly_available:
+        backend_choice = st.radio(
+            "Visualization Backend",
+            options=["altair", "plotly"],
+            index=0,
+            horizontal=True,
+            help="Altair: Fast, static charts. Plotly: Interactive charts with zoom/pan.",
+        )
+        return backend_choice
+
+    return default_backend
 
 
 def _render_column_charts(
@@ -63,6 +106,7 @@ def _render_column_charts(
     column: str,
     findings: list[GhostFinding],
     backend: str,
+    viz_backend_name: str = "altair",
 ) -> None:
     """Render charts for a specific column.
 
@@ -72,7 +116,25 @@ def _render_column_charts(
         column: Column name to visualize
         findings: Findings for this column
         backend: DataFrame backend
+        viz_backend_name: Visualization backend name ("altair" or "plotly")
     """
+    from lavendertown.ui.visualizations.base import get_backend
+
+    # Get visualization backend
+    try:
+        viz_backend = get_backend(viz_backend_name)
+    except ValueError:
+        st.error(f"Invalid visualization backend: {viz_backend_name}")
+        return
+
+    if not viz_backend.is_available():
+        st.error(
+            f"{viz_backend_name.title()} is not available. "
+            f"Install with: pip install lavendertown[{viz_backend_name}]"
+        )
+        return
+
+    # Import altair for data preparation (needed for both backends)
     try:
         import altair as alt
     except ImportError:
@@ -132,19 +194,28 @@ def _render_column_charts(
             )
             null_data = null_data.to_pandas()
 
-        null_chart = (
-            alt.Chart(null_data)
-            .mark_bar()
-            .encode(
-                x=alt.X("is_null:N", title="Is Null"),
-                y=alt.Y("count():Q", title="Count"),
-                color=alt.Color(
-                    "is_null:N", scale=alt.Scale(range=["#ff6b6b", "#51cf66"])
-                ),
+        # Render based on backend
+        if viz_backend_name == "plotly":
+            from lavendertown.ui.visualizations.plotly_charts import create_null_chart
+
+            plotly_fig = create_null_chart(null_data, column)
+            if plotly_fig:
+                viz_backend.render_chart(st, plotly_fig, "bar")
+        else:
+            # Altair
+            null_chart = (
+                alt.Chart(null_data)
+                .mark_bar()
+                .encode(
+                    x=alt.X("is_null:N", title="Is Null"),
+                    y=alt.Y("count():Q", title="Count"),
+                    color=alt.Color(
+                        "is_null:N", scale=alt.Scale(range=["#ff6b6b", "#51cf66"])
+                    ),
+                )
+                .properties(width=400, height=200)
             )
-            .properties(width=400, height=200)
-        )
-        st.altair_chart(null_chart, use_container_width=True)
+            viz_backend.render_chart(st, null_chart, "bar")
 
     # Outlier visualization (for numeric columns)
     outlier_findings = [f for f in findings if f.ghost_type == "outlier"]
@@ -187,7 +258,21 @@ def _render_column_charts(
                 )
 
                 outlier_chart = histogram + lower_rule + upper_rule
-                st.altair_chart(outlier_chart, use_container_width=True)
+
+                # Render based on backend
+                if viz_backend_name == "plotly":
+                    from lavendertown.ui.visualizations.plotly_charts import (
+                        create_outlier_chart,
+                    )
+
+                    plotly_fig = create_outlier_chart(
+                        chart_data, column, lower_bound, upper_bound
+                    )
+                    if plotly_fig:
+                        viz_backend.render_chart(st, plotly_fig, "histogram")
+                else:
+                    # Altair
+                    viz_backend.render_chart(st, outlier_chart, "histogram")
                 break
 
     # Time-series visualization (for time-series anomaly findings)
@@ -281,7 +366,24 @@ def _render_column_charts(
                 )
 
                 timeseries_chart = line_chart + anomaly_points
-                st.altair_chart(timeseries_chart, use_container_width=True)
+
+                # Render based on backend
+                if viz_backend_name == "plotly":
+                    from lavendertown.ui.visualizations.plotly_charts import (
+                        create_timeseries_chart,
+                    )
+
+                    anomaly_indices = (
+                        finding.row_indices if finding.row_indices is not None else None
+                    )
+                    plotly_fig = create_timeseries_chart(
+                        ts_data, datetime_col, column, anomaly_indices
+                    )
+                    if plotly_fig:
+                        viz_backend.render_chart(st, plotly_fig, "line")
+                else:
+                    # Altair
+                    viz_backend.render_chart(st, timeseries_chart, "line")
 
                 # Show method info
                 method = finding.metadata.get("method", "unknown")
@@ -323,7 +425,7 @@ def _render_column_charts(
                         )
                         .properties(width=600, height=300)
                     )
-                    st.altair_chart(score_chart, use_container_width=True)
+                    viz_backend.render_chart(st, score_chart, "bar")
                 break
 
     # Type distribution (for object/string columns)
@@ -349,7 +451,7 @@ def _render_column_charts(
                     )
                     .properties(width=600, height=300)
                 )
-                st.altair_chart(type_chart, use_container_width=True)
+                viz_backend.render_chart(st, type_chart, "bar")
                 break
 
 

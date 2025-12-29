@@ -9,6 +9,10 @@ from lavendertown.detectors.null import NullGhostDetector
 from lavendertown.detectors.outlier import OutlierGhostDetector
 from lavendertown.detectors.rule_based import RuleBasedDetector
 from lavendertown.detectors.timeseries import TimeSeriesAnomalyDetector
+from lavendertown.detectors.timeseries_features import (
+    extract_tsfresh_features,
+    get_feature_importance,
+)
 from lavendertown.detectors.type import TypeGhostDetector
 
 __all__ = [
@@ -20,4 +24,6 @@ __all__ = [
     "TimeSeriesAnomalyDetector",
     "MLAnomalyDetector",
     "ChangePointDetector",
+    "extract_tsfresh_features",
+    "get_feature_importance",
 ]

@@ -128,7 +128,11 @@ Advanced features and integrations for enhanced visualization, analysis, and inf
 | tsfresh time-series features | ⏳ Planned | Integrate tsfresh for advanced time-series feature extraction. Extract 700+ time-series features for ML-based anomaly detection. Enhance `TimeSeriesAnomalyDetector`. |
 | Streamlit Extras UI components | ⏳ Planned | Add Streamlit Extras components for enhanced UI. Better tables, badges, card layouts, and additional widgets. Polish the user interface. |
 | SQLAlchemy database backend | ⏳ Planned | Add database backend option for collaboration features. Replace file-based storage with SQLAlchemy (SQLite for local, PostgreSQL for multi-user). Enable querying and filtering of historical reports. |
-| Joblib parallel detector execution | ⏳ Planned | Add parallel execution of detectors for large datasets using Joblib. Speed up analysis by running independent detectors concurrently. |
+| Joblib parallel detector execution | ⏸️ Deferred | Add parallel execution of detectors for large datasets using Joblib. Speed up analysis by running independent detectors concurrently. **Deferred to future release due to multiprocessing compatibility issues with pytest.** |
+| Plotly interactive visualizations | ✅ Complete | Add Plotly as optional visualization backend for interactive charts with zoom, pan, and 3D visualizations. |
+| tsfresh time-series features | ✅ Complete | Integrate tsfresh for advanced time-series feature extraction (700+ features) for ML-based anomaly detection. |
+| Streamlit Extras UI components | ✅ Complete | Add Streamlit Extras components for enhanced UI including metric cards, badges, and improved layouts. |
+| SQLAlchemy database backend | ✅ Complete | Add database backend option for collaboration features with SQLite and PostgreSQL support. |
 
 **Status:** Phase 7 focuses on advanced features that enhance visualization capabilities, analysis depth, and infrastructure. Some features depend on user demand (e.g., SQLAlchemy if collaboration expands).
 
@@ -230,6 +234,11 @@ Advanced features and integrations for enhanced visualization, analysis, and inf
 - Comprehensive data profiling with ydata-profiling
 - Typer-based CLI alongside Click CLI
 - Faker integration for realistic test data generation
+- Modular UI component system for flexible interface customization
+- Plotly interactive visualizations with zoom, pan, and 3D charts
+- tsfresh time-series feature extraction (700+ features)
+- Streamlit Extras enhanced UI components
+- SQLAlchemy database backend for scalable collaboration
 
-**Future Enhancements:** Phase 7 is planned based on comprehensive package research (see `docs/RESEARCH_PYTHON_PACKAGES.md`). This phase will add advanced integrations for visualization, analysis depth, and infrastructure.
+**Future Enhancements:** Parallel detector execution (deferred to future release due to multiprocessing compatibility). Additional integrations based on comprehensive package research (see `docs/RESEARCH_PYTHON_PACKAGES.md`).
 

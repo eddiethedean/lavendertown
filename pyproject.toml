@@ -49,6 +49,7 @@ ml = [
 timeseries = [
     "statsmodels>=0.14.0",
     "ruptures>=1.1.0",
+    "tsfresh>=0.20.0",
 ]
 stats = [
     "scipy>=1.10.0",
@@ -63,6 +64,16 @@ cli = [
     "rich>=13.0.0",
     "python-dotenv>=1.0.0",
     "typer>=0.9.0",
+]
+plotly = [
+    "plotly>=5.0.0",
+]
+ui = [
+    "streamlit-extras>=0.3.0",
+]
+database = [
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
 ]
 dev = [
     "pytest>=7.0.0",
@@ -80,6 +91,7 @@ all = [
     "pyod>=1.1.0",
     "statsmodels>=0.14.0",
     "ruptures>=1.1.0",
+    "tsfresh>=0.20.0",
     "scipy>=1.10.0",
     "pyarrow>=14.0.0",
     "ydata-profiling>=4.5.0",
@@ -87,6 +99,10 @@ all = [
     "python-dotenv>=1.0.0",
     "orjson>=3.9.0",
     "typer>=0.9.0",
+    "plotly>=5.0.0",
+    "streamlit-extras>=0.3.0",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
 ]
 
 [project.scripts]

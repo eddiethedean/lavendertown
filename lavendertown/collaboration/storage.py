@@ -5,9 +5,37 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    pass
 
 from lavendertown.collaboration.models import Annotation, ShareableReport
 from lavendertown.models import GhostFinding
+
+
+def get_storage_backend() -> object:
+    """Get the configured storage backend.
+
+    Returns:
+        Storage backend instance (FileStorage or DatabaseStorage)
+    """
+    from lavendertown.config import get_config
+
+    storage_type = get_config("LAVENDERTOWN_STORAGE_TYPE", "file")
+
+    if storage_type == "database":
+        try:
+            from lavendertown.collaboration.database_storage import DatabaseStorage
+
+            database_url = get_config("LAVENDERTOWN_DATABASE_URL")
+            return DatabaseStorage(database_url=database_url)
+        except ImportError:
+            # Fallback to file storage if database not available
+            pass
+
+    # Default to file storage
+    return FileStorage()
 
 
 def _get_finding_id(finding: GhostFinding) -> str:
@@ -132,3 +160,23 @@ def get_finding_id(finding: GhostFinding) -> str:
         Unique string ID for the finding.
     """
     return _get_finding_id(finding)
+
+
+class FileStorage:
+    """File-based storage backend (existing implementation)."""
+
+    def save_annotation(self, annotation: Annotation) -> None:
+        """Save an annotation (delegates to module-level function)."""
+        save_annotation(annotation)
+
+    def load_annotations(self, finding_id: str) -> list[Annotation]:
+        """Load annotations (delegates to module-level function)."""
+        return load_annotations(finding_id)
+
+    def save_report(self, report: ShareableReport, filepath: str | None = None) -> Path:
+        """Save a report (delegates to module-level function)."""
+        return save_report(report, filepath)
+
+    def load_report(self, filepath: str) -> ShareableReport:
+        """Load a report (delegates to module-level function)."""
+        return load_report(filepath)

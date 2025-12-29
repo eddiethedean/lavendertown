@@ -115,6 +115,8 @@ def get_config_int(key: str, default: int | None = None) -> int | None:
 # Supported environment variables
 # LAVENDERTOWN_LOG_LEVEL: Logging level (DEBUG, INFO, WARNING, ERROR)
 # LAVENDERTOWN_OUTPUT_DIR: Default output directory for CLI commands
+# LAVENDERTOWN_STORAGE_TYPE: Storage backend type ("file" or "database")
+# LAVENDERTOWN_DATABASE_URL: Database URL for database storage backend
 
 # Load .env file on module import
 _load_dotenv()

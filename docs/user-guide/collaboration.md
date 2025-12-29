@@ -1,7 +1,7 @@
 # Collaboration Features
 
 !!! info "Version"
-    Collaboration features (annotations, shareable reports) were introduced in **v0.2.0**.
+    Collaboration features (annotations, shareable reports) were introduced in **v0.2.0**. Database backend support was added in **v0.7.0**.
 
 LavenderTown includes collaboration features for teams to work together on data quality issues.
 
@@ -113,6 +113,8 @@ Collaboration features are integrated into the Streamlit UI:
 
 ## Storage
 
+### File-Based Storage (Default)
+
 Annotations and reports are stored in a `.lavendertown/` directory:
 
 ```
@@ -124,6 +126,25 @@ Annotations and reports are stored in a `.lavendertown/` directory:
 ```
 
 **Note:** The `.lavendertown/` directory is automatically created and should be added to `.gitignore` to avoid committing collaboration data.
+
+### Database Backend (v0.7.0)
+
+For multi-user scenarios and scalable storage, you can use SQLAlchemy-based database storage:
+
+```bash
+# Install database support
+pip install lavendertown[database]
+
+# Configure via environment variables
+export LAVENDERTOWN_STORAGE_TYPE=database
+export LAVENDERTOWN_DATABASE_URL=postgresql://user:pass@localhost/lavendertown
+```
+
+**Supported Databases:**
+- **SQLite** (default): Local database at `.lavendertown/lavendertown.db`
+- **PostgreSQL**: Multi-user database for team collaboration
+
+See the [Database Storage API Reference](../api-reference/database_storage.md) for detailed documentation.
 
 ## Workflow Example
 

@@ -79,6 +79,17 @@ This document maps features to the PyPI versions where they were actually introd
 
 **Commit:** `d86b46a` - docs: Add file upload component documentation and fix ReadTheDocs build
 
+### v0.7.0
+**Phase 7: Advanced Integrations**
+
+- **Modular UI Components**: Flexible component system with `BaseComponent`, `ComponentWrapper`, and `ComponentLayout` for custom UI composition
+- **Plotly Interactive Visualizations**: Optional Plotly backend for interactive charts with zoom/pan, 3D visualizations, and enhanced time-series charts
+- **tsfresh Time-Series Features**: Advanced time-series feature extraction (700+ features) for ML-based anomaly detection
+- **Streamlit Extras UI Components**: Enhanced UI components including metric cards, badges, cards, and improved dataframe explorer
+- **SQLAlchemy Database Backend**: Optional database storage for collaboration features (SQLite and PostgreSQL support)
+
+**Commit:** `f917b87` - feat: Add modular UI component system and Phase 7 implementation plan
+
 ## Feature Quick Reference
 
 | Feature | Version | Notes |
@@ -114,3 +125,4 @@ This document maps features to the PyPI versions where they were actually introd
 - v0.3.0 was primarily a documentation and version bump release
 - v0.4.0 focused on performance and developer experience improvements (Phase 5)
 - v0.5.0 and v0.6.0 added advanced features and enhancements (Phase 6)
+- v0.7.0 introduced advanced integrations including Plotly, tsfresh, Streamlit Extras, and SQLAlchemy (Phase 7)

@@ -55,6 +55,7 @@ class TimeSeriesAnomalyDetector(GhostDetector):
         method: str = "zscore",
         sensitivity: float = 3.0,
         window_size: int = 10,
+        use_tsfresh_features: bool = False,
     ) -> None:
         """Initialize the time-series anomaly detector.
 
@@ -72,6 +73,9 @@ class TimeSeriesAnomalyDetector(GhostDetector):
                 values detect fewer anomalies. Default is 3.0.
             window_size: Window size for moving average method. Must be positive.
                 Default is 10.
+            use_tsfresh_features: Whether to use tsfresh-extracted features for
+                ML-based anomaly detection. Requires tsfresh to be installed.
+                Default is False.
 
         Raises:
             ValueError: If method is not one of the valid options, or if
@@ -89,6 +93,7 @@ class TimeSeriesAnomalyDetector(GhostDetector):
         self.method = method
         self.sensitivity = sensitivity
         self.window_size = window_size
+        self.use_tsfresh_features = use_tsfresh_features
 
     def detect(self, df: object) -> list[GhostFinding]:
         """Detect time-series anomalies in numeric columns.

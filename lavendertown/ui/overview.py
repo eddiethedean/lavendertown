@@ -17,23 +17,25 @@ def render_overview(st: object, findings: list[GhostFinding]) -> None:
     # Get filtered findings based on sidebar filters
     filtered_findings = _get_filtered_findings(st, findings)
 
-    # Key metrics
+    # Key metrics (use enhanced metric cards if available)
+    from lavendertown.ui.extras import render_metric_card
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("Total Ghosts", len(filtered_findings))
+        render_metric_card(st, "Total Ghosts", len(filtered_findings))
 
     with col2:
         error_count = sum(1 for f in filtered_findings if f.severity == "error")
-        st.metric("Errors", error_count, delta=None)
+        render_metric_card(st, "Errors", error_count)
 
     with col3:
         warning_count = sum(1 for f in filtered_findings if f.severity == "warning")
-        st.metric("Warnings", warning_count, delta=None)
+        render_metric_card(st, "Warnings", warning_count)
 
     with col4:
         info_count = sum(1 for f in filtered_findings if f.severity == "info")
-        st.metric("Info", info_count, delta=None)
+        render_metric_card(st, "Info", info_count)
 
     # Ghost type distribution
     if filtered_findings:

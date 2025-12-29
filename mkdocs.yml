@@ -100,6 +100,9 @@ nav:
     - Models: api-reference/models.md
     - Configuration: api-reference/config.md
     - Upload Component: api-reference/upload.md
+    - Visualizations: api-reference/visualizations.md
+    - Time-Series Features: api-reference/timeseries_features.md
+    - Database Storage: api-reference/database_storage.md
     - Detectors:
       - Base: api-reference/detectors/base.md
       - Null: api-reference/detectors/null.md
