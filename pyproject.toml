@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lavendertown"
-version = "0.6.0"
+version = "0.7.0"
 description = "A Streamlit-first Python package for detecting and visualizing data quality issues"
 readme = "README.md"
 requires-python = ">=3.10"

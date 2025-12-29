@@ -80,6 +80,7 @@ class Inspector:
         self,
         df: object,
         detectors: list[GhostDetector] | None = None,
+        ui_layout: object | None = None,
     ) -> None:
         """Initialize the Inspector.
 
@@ -89,12 +90,15 @@ class Inspector:
             detectors: Optional list of custom GhostDetector instances to use.
                 If None, uses the default set of detectors (NullGhostDetector,
                 TypeGhostDetector, OutlierGhostDetector).
+            ui_layout: Optional custom UI layout (ComponentLayout). If None, uses
+                the default layout with overview, charts, table, and export components.
 
         Raises:
             ValueError: If the DataFrame type cannot be detected (not Pandas or Polars).
         """
         self.df = df
         self.backend = detect_dataframe_backend(df)
+        self.ui_layout = ui_layout
 
         # Register detectors
         if detectors is None:
@@ -392,17 +396,14 @@ class Inspector:
     def _render_main(self, st: object, findings: list[GhostFinding]) -> None:
         """Render main content area.
 
-        Renders the main UI panels including overview, charts, table,
-        export section, and optionally the rules management panel.
+        Renders the main UI panels using the configured layout, and optionally
+        the rules management panel.
 
         Args:
             st: Streamlit module object.
             findings: List of GhostFinding objects to display.
         """
-        from lavendertown.ui.overview import render_overview
-        from lavendertown.ui.charts import render_charts
-        from lavendertown.ui.table import render_table
-        from lavendertown.ui.export import render_export_section
+        from lavendertown.ui.layout import ComponentLayout, create_default_layout
         from lavendertown.ui.rules import render_rule_management
 
         # Rules panel (if requested)
@@ -414,20 +415,12 @@ class Inspector:
                 # Note: rerun() would be called here in actual Streamlit app
             st.divider()  # type: ignore[attr-defined]
 
-        # Overview section
-        render_overview(st, findings)
+        # Use custom layout if provided, otherwise use default
+        layout: ComponentLayout
+        if self.ui_layout is not None:
+            layout = self.ui_layout  # type: ignore[assignment]
+        else:
+            layout = create_default_layout()
 
-        st.divider()  # type: ignore[attr-defined]
-
-        # Charts section
-        render_charts(st, self.df, findings, self.backend)
-
-        st.divider()  # type: ignore[attr-defined]
-
-        # Table section
-        render_table(st, self.df, findings, self.backend)
-
-        st.divider()  # type: ignore[attr-defined]
-
-        # Export section
-        render_export_section(st, findings)
+        # Render the layout
+        layout.render(st, df=self.df, findings=findings, backend=self.backend)

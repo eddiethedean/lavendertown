@@ -120,6 +120,7 @@ nav:
     - CLI: api-reference/cli.md
   - Guides:
     - Examples: guides/examples.md
+    - Modular UI Components: guides/modular-ui-components.md
     - Deployment: guides/deployment.md
     - Performance: guides/performance.md
   - Design:
