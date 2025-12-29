@@ -126,4 +126,5 @@ nav:
     - Architecture: design/architecture.md
     - Design Specification: design/design-spec.md
     - Roadmap: design/roadmap.md
+    - Version Mapping: VERSION_MAPPING.md
 

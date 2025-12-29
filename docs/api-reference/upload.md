@@ -1,5 +1,8 @@
 # File Upload Component
 
+!!! info "Version"
+    This feature was introduced in **v0.6.0**.
+
 Enhanced file upload UI component with drag-and-drop support, animated progress indicators, and automatic encoding detection.
 
 ::: lavendertown.ui.upload.render_file_upload

@@ -11,22 +11,24 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 
 ## ✨ Features
 
-- 🔍 **Zero-config data quality insights** - Get started with minimal setup
-- 📊 **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit
-- 🎯 **Interactive ghost detection** - Drill down into problematic rows
-- 🐼 **Pandas & Polars support** - Works with your existing data pipelines
-- 📤 **Exportable findings** - Download results as JSON, CSV, or Parquet with one click
-- 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets
-- ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI
-- 📁 **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection
-- 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
-- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation (Click and Typer support)
-- 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations
-- ⚙️ **Configuration Management** - Environment-based configuration with `.env` file support
-- 🤖 **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration
-- 📈 **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling with ydata-profiling
-- 📊 **Statistical Tests** - Kolmogorov-Smirnov and chi-square tests for rigorous drift detection
-- 💾 **Parquet Export** - Efficient columnar storage format for large datasets
+> **Version Info:** Features are marked with the PyPI version where they were introduced. See [Version Mapping](docs/VERSION_MAPPING.md) for details.
+
+- 🔍 **Zero-config data quality insights** - Get started with minimal setup *(v0.1.0)*
+- 📊 **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit *(v0.1.0)*
+- 🎯 **Interactive ghost detection** - Drill down into problematic rows *(v0.1.0)*
+- 🐼 **Pandas & Polars support** - Works with your existing data pipelines *(v0.1.0 / Polars: v0.3.0)*
+- 📤 **Exportable findings** - Download results as JSON, CSV, or Parquet with one click *(JSON/CSV: v0.1.0, Parquet: v0.6.0)*
+- 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets *(v0.3.0, Statistical tests: v0.6.0)*
+- ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI *(v0.3.0)*
+- 📁 **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection *(v0.6.0)*
+- 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization *(orjson: v0.5.0)*
+- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation (Click and Typer support) *(Click: v0.4.0, Rich: v0.5.0, Typer: v0.6.0)*
+- 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations *(v0.4.0)*
+- ⚙️ **Configuration Management** - Environment-based configuration with `.env` file support *(v0.5.0)*
+- 🤖 **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration *(scikit-learn: v0.5.0, PyOD: v0.6.0)*
+- 📈 **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling with ydata-profiling *(Time-series: v0.5.0, Change points: v0.6.0, Profiling: v0.6.0)*
+- 📊 **Statistical Tests** - Kolmogorov-Smirnov and chi-square tests for rigorous drift detection *(v0.6.0)*
+- 💾 **Parquet Export** - Efficient columnar storage format for large datasets *(v0.6.0)*
 
 ## 📦 Installation
 

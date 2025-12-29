@@ -1,5 +1,8 @@
 # Custom Rules
 
+!!! info "Version"
+    Custom rules were introduced in **v0.3.0**. Cross-column rules were added in **v0.5.0**.
+
 LavenderTown allows you to create custom data quality rules beyond the built-in detectors. Rules can be created through the UI or programmatically.
 
 ## Rule Types

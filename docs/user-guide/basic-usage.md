@@ -109,6 +109,9 @@ inspector = Inspector(df_polars)  # Automatically uses Polars backend
 
 ## File Upload Component
 
+!!! info "Version"
+    This feature was introduced in **v0.6.0**.
+
 LavenderTown includes an enhanced file upload component for Streamlit applications with drag-and-drop support, animated progress indicators, and automatic encoding detection.
 
 ### Using the Upload Component

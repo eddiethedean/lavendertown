@@ -1,5 +1,8 @@
 # Collaboration Features
 
+!!! info "Version"
+    Collaboration features (annotations, shareable reports) were introduced in **v0.5.0**.
+
 LavenderTown includes collaboration features for teams to work together on data quality issues.
 
 ## Overview

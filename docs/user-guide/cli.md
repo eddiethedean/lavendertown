@@ -1,5 +1,8 @@
 # Command-Line Interface
 
+!!! info "Version"
+    CLI was introduced in **v0.4.0** (Click framework). Rich formatting was added in **v0.5.0**. Typer CLI was added in **v0.6.0**.
+
 LavenderTown includes a powerful CLI with beautiful, interactive output for batch processing and automation. The CLI features progress bars, formatted tables, and color-coded messages for an enhanced user experience.
 
 **Phase 6 Update:** LavenderTown now includes both a Click-based CLI (the original) and a Typer-based CLI (new). Both support the same commands and options, including Parquet export format.
