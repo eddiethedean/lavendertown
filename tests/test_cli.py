@@ -16,7 +16,7 @@ from lavendertown.rules.storage import save_ruleset
 @pytest.fixture
 def sample_csv_file(tmp_path: pytest.TempPathFactory) -> Path:
     """Create a sample CSV file for testing."""
-    csv_file = tmp_path / "sample.csv"
+    csv_file = Path(str(tmp_path)) / "sample.csv"
     csv_content = "name,age,email\nAlice,25,alice@example.com\nBob,30,bob@example.com\n"
     csv_file.write_text(csv_content)
     return csv_file
@@ -35,7 +35,7 @@ def sample_rules_file(tmp_path: pytest.TempPathFactory) -> Path:
             parameters={"min_value": 0, "max_value": 150},
         )
     )
-    rules_file = tmp_path / "rules.json"
+    rules_file = Path(str(tmp_path)) / "rules.json"
     save_ruleset(ruleset, rules_file)
     return rules_file
 

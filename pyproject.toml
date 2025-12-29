@@ -49,6 +49,18 @@ great_expectations = [
 ]
 # Note: Installing great_expectations will automatically install altair 4.x
 # LavenderTown is compatible with both altair 4.x and 5.x
+ml = [
+    "scikit-learn>=1.0.0",
+]
+timeseries = [
+    "statsmodels>=0.14.0",
+]
+all = [
+    "pandera>=0.18.0",
+    "great-expectations>=0.18.0",
+    "scikit-learn>=1.0.0",
+    "statsmodels>=0.14.0",
+]
 
 [project.scripts]
 lavendertown = "lavendertown.cli:cli"

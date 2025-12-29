@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from lavendertown.logging_config import get_logger
 from lavendertown.rules.executors import EnumRule, RangeRule, RegexRule
+from lavendertown.rules.cross_column import CrossColumnRule
 from lavendertown.rules.models import Rule, RuleSet
 from lavendertown.rules.storage import ruleset_from_json, ruleset_to_json
 
@@ -31,17 +32,19 @@ def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
         st.warning("No columns available. Load a dataset first.")
         return None
 
-    selected_column = st.selectbox(
-        "Column", options=columns, help="Select column to apply rule to"
-    )
-
     rule_type = st.selectbox(
         "Rule Type",
-        options=["range", "regex", "enum"],
+        options=["range", "regex", "enum", "cross_column"],
         help="Type of rule to create",
     )
 
     rule_params: dict[str, object] = {}
+    selected_column: str | None = None
+
+    if rule_type != "cross_column":
+        selected_column = st.selectbox(
+            "Column", options=columns, help="Select column to apply rule to"
+        )
 
     if rule_type == "range":
         col1, col2 = st.columns(2)
@@ -91,12 +94,101 @@ def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
         else:
             st.warning("Please provide allowed values")
 
+    elif rule_type == "cross_column":
+        st.write("**Cross-Column Rule Configuration**")
+
+        # Source columns (at least 2)
+        num_source_cols = st.number_input(
+            "Number of Source Columns",
+            min_value=2,
+            max_value=min(10, len(columns)),
+            value=2,
+            help="Number of columns to use in the rule (minimum 2)",
+        )
+
+        source_columns = st.multiselect(
+            "Source Columns",
+            options=columns,
+            max_selections=num_source_cols,
+            help="Select columns to use in the rule",
+        )
+
+        if len(source_columns) < 2:
+            st.warning("Please select at least 2 source columns")
+        else:
+            rule_params["source_columns"] = source_columns
+
+            # Operation type
+            operation = st.selectbox(
+                "Operation",
+                options=[
+                    "equals",
+                    "greater_than",
+                    "less_than",
+                    "sum_equals",
+                    "conditional",
+                    "referential",
+                ],
+                help="Type of cross-column operation",
+            )
+            rule_params["operation"] = operation
+
+            # Target column (for sum_equals and referential)
+            if operation in ["sum_equals", "referential"]:
+                target_column = st.selectbox(
+                    "Target Column",
+                    options=[c for c in columns if c not in source_columns],
+                    help="Target column for the operation",
+                )
+                if target_column:
+                    rule_params["target_column"] = target_column
+                else:
+                    st.warning(
+                        f"Please select a target column for {operation} operation"
+                    )
+
+            # Conditional rule configuration
+            if operation == "conditional":
+                st.write("**Conditional Rule Configuration**")
+                if_col = st.selectbox(
+                    "If Column",
+                    options=source_columns,
+                    help="Column to check the condition on",
+                )
+                if_value = st.text_input(
+                    "If Value",
+                    help="Value to check for in the 'If Column'",
+                )
+                then_col = st.selectbox(
+                    "Then Column",
+                    options=[c for c in columns if c not in source_columns],
+                    help="Column to validate if condition is met",
+                )
+                then_value = st.text_input(
+                    "Then Value",
+                    help="Expected value in 'Then Column' when condition is met",
+                )
+
+                if if_col and if_value and then_col and then_value:
+                    rule_params["condition"] = {
+                        "if_column": if_col,
+                        "if_value": if_value,
+                        "then_column": then_col,
+                        "then_value": then_value,
+                    }
+                else:
+                    st.warning("Please fill in all conditional rule fields")
+
     create_button = st.button("Create Rule", type="primary")
 
-    if create_button and rule_name and rule_description and selected_column:
-        if rule_type == "range" and (
-            rule_params.get("min_value") is not None
-            or rule_params.get("max_value") is not None
+    if create_button and rule_name and rule_description:
+        if (
+            rule_type == "range"
+            and selected_column
+            and (
+                rule_params.get("min_value") is not None
+                or rule_params.get("max_value") is not None
+            )
         ):
             return Rule(
                 name=rule_name,
@@ -106,7 +198,7 @@ def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
                 parameters=rule_params,
                 enabled=True,
             )
-        elif rule_type == "regex" and rule_params.get("pattern"):
+        elif rule_type == "regex" and selected_column and rule_params.get("pattern"):
             return Rule(
                 name=rule_name,
                 description=rule_description,
@@ -115,12 +207,40 @@ def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
                 parameters=rule_params,
                 enabled=True,
             )
-        elif rule_type == "enum" and rule_params.get("allowed_values"):
+        elif (
+            rule_type == "enum"
+            and selected_column
+            and rule_params.get("allowed_values")
+        ):
             return Rule(
                 name=rule_name,
                 description=rule_description,
                 rule_type="enum",
                 column=selected_column,
+                parameters=rule_params,
+                enabled=True,
+            )
+        elif (
+            rule_type == "cross_column"
+            and rule_params.get("source_columns")
+            and len(rule_params.get("source_columns", [])) >= 2
+        ):
+            # Validate operation-specific requirements
+            operation = rule_params.get("operation")
+            if operation in ["sum_equals", "referential"]:
+                if not rule_params.get("target_column"):
+                    st.error(f"Operation '{operation}' requires a target column")
+                    return None
+            elif operation == "conditional":
+                if not rule_params.get("condition"):
+                    st.error("Conditional operation requires condition configuration")
+                    return None
+
+            return Rule(
+                name=rule_name,
+                description=rule_description,
+                rule_type="cross_column",
+                column=None,  # Cross-column rules don't have a single column
                 parameters=rule_params,
                 enabled=True,
             )
@@ -174,7 +294,9 @@ def render_rule_list(st: object, ruleset: RuleSet, df: object) -> RuleSet:
     return ruleset
 
 
-def create_rule_executor(rule: Rule) -> RangeRule | RegexRule | EnumRule | None:
+def create_rule_executor(
+    rule: Rule,
+) -> RangeRule | RegexRule | EnumRule | CrossColumnRule | None:
     """Create an executor instance from a Rule model.
 
     Args:
@@ -213,6 +335,29 @@ def create_rule_executor(rule: Rule) -> RangeRule | RegexRule | EnumRule | None:
             description=rule.description,
             column=rule.column or "",
             allowed_values=[str(v) for v in allowed_values],
+        )
+    elif rule.rule_type == "cross_column":
+        from lavendertown.rules.cross_column import CrossColumnRule
+
+        source_columns = rule.parameters.get("source_columns")
+        if (
+            not source_columns
+            or not isinstance(source_columns, list)
+            or len(source_columns) < 2
+        ):
+            return None
+
+        operation = rule.parameters.get("operation")
+        if not operation:
+            return None
+
+        return CrossColumnRule(
+            name=rule.name,
+            description=rule.description,
+            source_columns=source_columns,
+            operation=operation,
+            target_column=rule.parameters.get("target_column"),
+            condition=rule.parameters.get("condition"),
         )
 
     return None

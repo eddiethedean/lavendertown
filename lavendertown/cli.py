@@ -539,5 +539,127 @@ def export_rules(
         sys.exit(1)
 
 
+@cli.command()
+@click.argument("findings_file", type=click.Path(exists=True))
+@click.option(
+    "--title",
+    required=True,
+    help="Report title",
+)
+@click.option(
+    "--author",
+    default="CLI User",
+    help="Author name",
+)
+@click.option(
+    "--rules-file",
+    type=click.Path(exists=True),
+    help="Path to ruleset JSON file (optional)",
+)
+@click.option(
+    "--output-file",
+    type=click.Path(),
+    help="Output file path (optional, defaults to .lavendertown/reports/)",
+)
+def share(
+    findings_file: str,
+    title: str,
+    author: str,
+    rules_file: str | None,
+    output_file: str | None,
+) -> None:
+    """Export findings as a shareable report.
+
+    Example:
+        lavendertown share findings.json --title "Q4 Report" --author "Alice"
+    """
+    try:
+        from lavendertown.collaboration.api import (
+            create_shareable_report,
+            export_report,
+        )
+        from lavendertown.models import GhostFinding
+
+        click.echo(f"Loading findings from {findings_file}...")
+
+        # Load findings
+        with open(findings_file, "r") as f:
+            findings_data = json.load(f)
+
+        findings = [GhostFinding.from_dict(f) for f in findings_data]
+
+        # Load ruleset if provided
+        ruleset = None
+        if rules_file:
+            ruleset = load_ruleset(rules_file)
+
+        # Create report
+        report = create_shareable_report(
+            title=title,
+            author=author,
+            findings=findings,
+            ruleset=ruleset,
+        )
+
+        # Export
+        report_path = export_report(report, output_file)
+        click.echo(f"Report exported to: {report_path}")
+
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("report_file", type=click.Path(exists=True))
+@click.option(
+    "--output-dir",
+    type=click.Path(),
+    help="Directory to extract findings and ruleset (optional)",
+)
+def import_report(
+    report_file: str,
+    output_dir: str | None,
+) -> None:
+    """Import a shareable report.
+
+    Example:
+        lavendertown import-report report.json --output-dir ./imported/
+    """
+    try:
+        from lavendertown.collaboration.api import import_report
+
+        click.echo(f"Importing report from {report_file}...")
+
+        report = import_report(report_file)
+
+        click.echo(f"Report: {report.title}")
+        click.echo(f"Author: {report.author}")
+        click.echo(f"Created: {report.created_at}")
+        click.echo(f"Findings: {len(report.findings)}")
+        click.echo(f"Annotations: {len(report.annotations)}")
+
+        if output_dir:
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Export findings
+            findings_file = output_path / "findings.json"
+            with open(findings_file, "w") as f:
+                json.dump([f.to_dict() for f in report.findings], f, indent=2)
+            click.echo(f"Findings exported to {findings_file}")
+
+            # Export ruleset if present
+            if report.ruleset:
+                ruleset_file = output_path / "ruleset.json"
+                with open(ruleset_file, "w") as f:
+                    json.dump(report.ruleset.to_dict(), f, indent=2)
+                click.echo(f"Ruleset exported to {ruleset_file}")
+
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     cli()

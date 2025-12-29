@@ -139,6 +139,101 @@ pip install lavendertown[polars]
 - Automatic backend detection
 - Performance optimization tips
 
+### 5. Time-Series Anomaly Detection (`timeseries_example.py`)
+
+Demonstrates detecting anomalies in time-series data using statistical methods.
+
+**Run it:**
+```bash
+streamlit run examples/timeseries_example.py
+```
+
+**Prerequisites:**
+```bash
+pip install lavendertown[timeseries]  # For seasonal decomposition
+```
+
+**What it shows:**
+- Z-score anomaly detection
+- Moving average deviation detection
+- Seasonal decomposition (requires statsmodels)
+- Configurable sensitivity and window size
+
+**Key features:**
+- Multiple detection methods
+- Automatic datetime column detection
+- Interactive parameter tuning
+- Time-series visualization
+
+### 6. ML-Assisted Anomaly Detection (`ml_anomaly_example.py`)
+
+Shows how to use machine learning algorithms to detect complex anomalies.
+
+**Run it:**
+```bash
+streamlit run examples/ml_anomaly_example.py
+```
+
+**Prerequisites:**
+```bash
+pip install lavendertown[ml]
+```
+
+**What it shows:**
+- Isolation Forest algorithm
+- Local Outlier Factor (LOF)
+- One-Class SVM
+- Multi-dimensional anomaly detection
+
+**Key features:**
+- Three ML algorithms to choose from
+- Configurable contamination rate
+- Works with multi-column data
+- Automatic feature normalization
+
+### 7. Cross-Column Validation Rules (`cross_column_rules_example.py`)
+
+Demonstrates validating relationships between multiple columns.
+
+**Run it:**
+```bash
+streamlit run examples/cross_column_rules_example.py
+```
+
+**What it shows:**
+- Equality checks between columns
+- Comparison rules (greater than, less than)
+- Arithmetic validation (sum equals)
+- Conditional logic (if-then rules)
+- Referential integrity checks
+
+**Key features:**
+- Six operation types
+- Business logic validation
+- Data consistency checks
+- Integration with RuleSet system
+
+### 8. Collaboration Features (`collaboration_example.py`)
+
+Shows how to use annotations and shareable reports for team collaboration.
+
+**Run it:**
+```bash
+streamlit run examples/collaboration_example.py
+```
+
+**What it shows:**
+- Adding annotations to findings
+- Tagging and status tracking
+- Creating shareable reports
+- Importing/exporting reports
+
+**Key features:**
+- Team collaboration on findings
+- Status tracking (reviewed, fixed, false positive)
+- Report sharing and export
+- Finding annotations with comments
+
 ## Usage Patterns
 
 ### Pattern 1: Quick Analysis with UI
@@ -234,6 +329,134 @@ findings = inspector.detect()  # Use programmatically
 
 > **Note:** Install Polars support with `pip install lavendertown[polars]`
 
+### Pattern 5: Time-Series Anomaly Detection
+
+For detecting anomalies in temporal data:
+
+```python
+from lavendertown import Inspector
+from lavendertown.detectors.timeseries import TimeSeriesAnomalyDetector
+import pandas as pd
+
+# Create time-series data
+dates = pd.date_range("2024-01-01", periods=100, freq="D")
+values = [100 + i * 0.5 + (i % 7 - 3) * 2 for i in range(100)]
+df = pd.DataFrame({"date": dates, "value": values})
+
+# Create time-series detector
+detector = TimeSeriesAnomalyDetector(
+    datetime_column="date",
+    method="zscore",
+    sensitivity=3.0
+)
+
+inspector = Inspector(df, detectors=[detector])
+inspector.render()
+```
+
+> **Note:** Install time-series support with `pip install lavendertown[timeseries]`
+
+### Pattern 6: ML-Assisted Anomaly Detection
+
+For detecting complex anomalies using machine learning:
+
+```python
+from lavendertown import Inspector
+from lavendertown.detectors.ml_anomaly import MLAnomalyDetector
+import pandas as pd
+
+# Create multi-dimensional data
+df = pd.DataFrame({
+    "feature1": [1, 2, 3, 4, 5, 50],
+    "feature2": [10, 11, 12, 13, 14, 100],
+    "feature3": [100, 101, 102, 103, 104, 200],
+})
+
+# Create ML detector
+detector = MLAnomalyDetector(
+    algorithm="isolation_forest",
+    contamination=0.1
+)
+
+inspector = Inspector(df, detectors=[detector])
+findings = inspector.detect()
+```
+
+> **Note:** Install ML support with `pip install lavendertown[ml]`
+
+### Pattern 7: Cross-Column Validation
+
+For validating relationships between columns:
+
+```python
+from lavendertown import Inspector
+from lavendertown.rules.cross_column import CrossColumnRule
+from lavendertown.rules.models import RuleSet
+import pandas as pd
+
+# Create data
+df = pd.DataFrame({
+    "quantity": [10, 20, 30],
+    "unit_price": [5.0, 10.0, 15.0],
+    "subtotal": [50.0, 200.0, 450.0],  # Some don't match
+})
+
+# Create cross-column rule
+ruleset = RuleSet(name="validation", description="Cross-column checks")
+ruleset.add_rule(
+    CrossColumnRule(
+        name="subtotal_check",
+        description="Subtotal must equal quantity * unit_price",
+        source_columns=["quantity", "unit_price"],
+        operation="sum_equals",
+        target_column="subtotal",
+    )
+)
+
+# Use with Inspector
+inspector = Inspector(df)
+inspector.render()  # Rules can be added via UI or programmatically
+```
+
+### Pattern 8: Collaboration and Reporting
+
+For team collaboration on findings:
+
+```python
+from lavendertown import Inspector
+from lavendertown.collaboration.api import (
+    add_annotation,
+    create_shareable_report,
+    export_report,
+)
+import pandas as pd
+
+df = pd.DataFrame({"value": [1, 2, None, 4, 5]})
+inspector = Inspector(df)
+findings = inspector.detect()
+
+# Add annotation to a finding
+if findings:
+    annotation = add_annotation(
+        findings[0],
+        author="Data Team",
+        comment="This needs investigation",
+        tags=["critical", "needs-review"],
+        status="needs-investigation"
+    )
+
+# Create shareable report
+report = create_shareable_report(
+    title="Q4 Data Quality Report",
+    author="Data Team",
+    findings=findings
+)
+
+# Export report
+report_path = export_report(report)
+print(f"Report saved to: {report_path}")
+```
+
 ## Customizing Examples
 
 All examples can be customized to work with your own data:
@@ -250,6 +473,10 @@ All examples can be customized to work with your own data:
 - **Automated checks**: Use programmatic API (`inspector.detect()`)
 - **Interactive exploration**: Use Streamlit UI (`inspector.render()`)
 - **Production monitoring**: Combine drift detection with automated alerts
+- **Time-series data**: Use `TimeSeriesAnomalyDetector` for temporal anomaly detection
+- **Complex anomalies**: Use `MLAnomalyDetector` for ML-based detection
+- **Business logic**: Use `CrossColumnRule` for multi-column validation
+- **Team collaboration**: Use annotations and shareable reports for workflow management
 
 ## Next Steps
 

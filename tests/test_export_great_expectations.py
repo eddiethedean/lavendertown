@@ -188,7 +188,9 @@ def test_export_ruleset_to_great_expectations_file(
             export_ruleset_to_great_expectations_file,
         )
 
-        output_file = tmp_path / "expectation_suite.json"
+        from pathlib import Path
+
+        output_file = Path(str(tmp_path)) / "expectation_suite.json"
         export_ruleset_to_great_expectations_file(sample_ruleset, str(output_file))
 
         assert output_file.exists()
@@ -218,7 +220,7 @@ def test_export_ruleset_to_great_expectations_suite_name(
             sample_ruleset, suite_name=custom_name
         )
 
-        assert suite.expectation_suite_name == custom_name
+        assert suite.name == custom_name
     except ImportError:
         pytest.skip("great-expectations not installed")
 

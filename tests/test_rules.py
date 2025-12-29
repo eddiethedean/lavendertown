@@ -10,6 +10,7 @@ import pytest
 
 from lavendertown.detectors.rule_based import RuleBasedDetector
 from lavendertown.rules.executors import EnumRule, RangeRule, RegexRule
+from lavendertown.rules.cross_column import CrossColumnRule
 from lavendertown.rules.models import Rule, RuleSet
 from lavendertown.rules.storage import (
     load_ruleset,
@@ -276,3 +277,354 @@ class TestRuleStorage:
         """Test that invalid JSON raises ValueError."""
         with pytest.raises(ValueError):
             ruleset_from_json("not valid json {")
+
+
+class TestCrossColumnRules:
+    """Test cross-column validation rules."""
+
+    def test_cross_column_equals_rule(self):
+        """Test equals cross-column rule."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3, 4, 5],
+                "col2": [1, 2, 99, 4, 5],  # 99 is violation
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="equals_rule",
+            description="col1 must equal col2",
+            source_columns=["col1", "col2"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].ghost_type == "rule"
+        assert findings[0].metadata["operation"] == "equals"
+
+    def test_cross_column_greater_than_rule(self):
+        """Test greater_than cross-column rule."""
+        df = pd.DataFrame(
+            {
+                "price": [100, 200, 150, 300],
+                "cost": [50, 150, 200, 250],  # 200 > 150 is violation
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="price_gt_cost",
+            description="price must be greater than cost",
+            source_columns=["price", "cost"],
+            operation="greater_than",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["operation"] == "greater_than"
+
+    def test_cross_column_sum_equals_rule(self):
+        """Test sum_equals cross-column rule."""
+        df = pd.DataFrame(
+            {
+                "col1": [10, 20, 30],
+                "col2": [5, 10, 15],
+                "total": [15, 30, 50],  # 50 != 30+15 is violation
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="sum_rule",
+            description="col1 + col2 must equal total",
+            source_columns=["col1", "col2"],
+            operation="sum_equals",
+            target_column="total",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["operation"] == "sum_equals"
+
+    def test_cross_column_conditional_rule(self):
+        """Test conditional cross-column rule."""
+        df = pd.DataFrame(
+            {
+                "status": ["active", "active", "inactive", "active"],
+                "priority": ["high", "low", "low", "medium"],  # active should be high
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="conditional_rule",
+            description="if status is active, priority must be high",
+            source_columns=["status", "priority"],
+            operation="conditional",
+            condition={
+                "if_column": "status",
+                "if_value": "active",
+                "then_column": "priority",
+                "then_value": "high",
+            },
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["operation"] == "conditional"
+
+    def test_cross_column_referential_rule(self):
+        """Test referential integrity cross-column rule."""
+        df = pd.DataFrame(
+            {
+                "category": ["A", "B", "C", "D"],  # D doesn't exist in valid_categories
+                "valid_categories": ["A", "B", "C", "A"],
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="referential_rule",
+            description="category must exist in valid_categories",
+            source_columns=["category"],
+            operation="referential",
+            target_column="valid_categories",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["operation"] == "referential"
+
+    def test_cross_column_rule_invalid_columns(self):
+        """Test cross-column rule with missing columns."""
+        df = pd.DataFrame({"col1": [1, 2, 3]})
+
+        rule = CrossColumnRule(
+            name="invalid_rule",
+            description="test",
+            source_columns=["col1", "nonexistent"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].severity == "error"
+        assert "Missing columns" in findings[0].description
+
+    def test_cross_column_rule_invalid_operation(self):
+        """Test cross-column rule with invalid operation."""
+        with pytest.raises(ValueError, match="Operation must be one of"):
+            CrossColumnRule(
+                name="invalid",
+                description="test",
+                source_columns=["col1", "col2"],
+                operation="invalid_op",
+            )
+
+    def test_cross_column_rule_insufficient_columns(self):
+        """Test cross-column rule with insufficient columns."""
+        with pytest.raises(ValueError, match="require at least 2 columns"):
+            CrossColumnRule(
+                name="invalid",
+                description="test",
+                source_columns=["col1"],
+                operation="equals",
+            )
+
+    def test_cross_column_rule_polars(self):
+        """Test cross-column rule with Polars DataFrame."""
+        try:
+            import polars as pl
+        except ImportError:
+            pytest.skip("Polars not installed")
+
+        df = pl.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "col2": [1, 99, 3],  # 99 is violation
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="equals_rule",
+            description="col1 must equal col2",
+            source_columns=["col1", "col2"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].row_indices is None  # Polars doesn't maintain indices
+
+    def test_cross_column_rule_with_nulls(self):
+        """Test cross-column rule handles null values correctly."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, None, 4, 5],
+                "col2": [1, 2, 3, None, 5],
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="equals_rule",
+            description="col1 must equal col2",
+            source_columns=["col1", "col2"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        # Should only flag non-null mismatches
+        assert isinstance(findings, list)
+
+    def test_cross_column_sum_equals_multiple_columns(self):
+        """Test sum_equals with multiple source columns."""
+        df = pd.DataFrame(
+            {
+                "col1": [10, 20, 30],
+                "col2": [5, 10, 15],
+                "col3": [2, 3, 4],
+                "total": [16, 33, 50],  # 16 != 10+5+2 (17), 50 != 30+15+4 (49)
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="sum_rule",
+            description="col1 + col2 + col3 must equal total",
+            source_columns=["col1", "col2", "col3"],
+            operation="sum_equals",
+            target_column="total",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["operation"] == "sum_equals"
+
+    def test_cross_column_conditional_multiple_conditions(self):
+        """Test conditional rule with multiple condition values."""
+        df = pd.DataFrame(
+            {
+                "status": ["active", "inactive", "pending", "active"],
+                "priority": ["high", "low", "medium", "low"],  # active should be high
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="conditional_rule",
+            description="if status is active, priority must be high",
+            source_columns=["status", "priority"],
+            operation="conditional",
+            condition={
+                "if_column": "status",
+                "if_value": "active",
+                "then_column": "priority",
+                "then_value": "high",
+            },
+        )
+
+        findings = rule.check(df)
+        # Should find violations where status=active but priority != high
+        assert len(findings) > 0
+
+    def test_cross_column_referential_empty_target(self):
+        """Test referential rule with empty target column (all nulls)."""
+        df = pd.DataFrame(
+            {
+                "category": ["A", "B", "C"],
+                "valid_categories": [None, None, None],  # All nulls - effectively empty
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="referential_rule",
+            description="category must exist in valid_categories",
+            source_columns=["category"],
+            operation="referential",
+            target_column="valid_categories",
+        )
+
+        findings = rule.check(df)
+        # All values should be violations
+        assert len(findings) > 0
+
+    def test_cross_column_rule_no_violations(self):
+        """Test cross-column rule with no violations."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3, 4, 5],
+                "col2": [1, 2, 3, 4, 5],
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="equals_rule",
+            description="col1 must equal col2",
+            source_columns=["col1", "col2"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) == 0
+
+    def test_cross_column_rule_all_violations(self):
+        """Test cross-column rule where all rows violate."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "col2": [10, 20, 30],  # All different
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="equals_rule",
+            description="col1 must equal col2",
+            source_columns=["col1", "col2"],
+            operation="equals",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].metadata["violation_count"] == 3
+
+    def test_cross_column_rule_missing_target_column(self):
+        """Test cross-column rule with missing target column."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "col2": [4, 5, 6],
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="sum_rule",
+            description="test",
+            source_columns=["col1", "col2"],
+            operation="sum_equals",
+            target_column="nonexistent",
+        )
+
+        findings = rule.check(df)
+        assert len(findings) > 0
+        assert findings[0].severity == "error"
+        assert "Missing columns" in findings[0].description
+
+    def test_cross_column_rule_incomplete_condition(self):
+        """Test conditional rule with incomplete condition."""
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "col2": [10, 20, 30],
+            }
+        )
+
+        rule = CrossColumnRule(
+            name="conditional_rule",
+            description="test",
+            source_columns=["col1", "col2"],
+            operation="conditional",
+            condition={
+                "if_column": "col1",
+                "if_value": "1",
+                # Missing then_column and then_value
+            },
+        )
+
+        findings = rule.check(df)
+        # Should handle gracefully
+        assert isinstance(findings, list)

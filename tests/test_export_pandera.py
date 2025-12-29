@@ -58,8 +58,10 @@ def test_export_ruleset_to_pandera_missing_dependency(sample_ruleset: RuleSet) -
     pandera_module = sys.modules.get("lavendertown.export.pandera")
     if pandera_module:
         original_pa = getattr(pandera_module, "pa", None)
-        pandera_module.pa = None  # type: ignore[assignment]
-        pandera_module.Schema = None  # type: ignore[assignment]
+        pandera_module.pa = None  # type: ignore[attr-defined,assignment]
+        pandera_module.Schema = None  # type: ignore[attr-defined,assignment]
+        # Also ignore the attribute access check
+        _ = getattr(pandera_module, "pa", None)  # type: ignore[attr-defined]
 
     try:
         from lavendertown.export.pandera import export_ruleset_to_pandera
@@ -69,7 +71,7 @@ def test_export_ruleset_to_pandera_missing_dependency(sample_ruleset: RuleSet) -
     finally:
         # Restore if it existed
         if pandera_module and original_pa is not None:
-            pandera_module.pa = original_pa
+            pandera_module.pa = original_pa  # type: ignore[attr-defined,assignment]
 
 
 @pytest.mark.skipif(
@@ -142,7 +144,9 @@ def test_export_ruleset_to_pandera_file(
     try:
         from lavendertown.export.pandera import export_ruleset_to_pandera_file
 
-        output_file = tmp_path / "schema.py"
+        from pathlib import Path
+
+        output_file = Path(str(tmp_path)) / "schema.py"
         export_ruleset_to_pandera_file(
             sample_ruleset,
             str(output_file),

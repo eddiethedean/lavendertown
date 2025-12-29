@@ -130,6 +130,9 @@ dmypy.json
 # Streamlit
 .streamlit/
 
+# LavenderTown
+.lavendertown/
+
 # IDE
 .vscode/
 .idea/

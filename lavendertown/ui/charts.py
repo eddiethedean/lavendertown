@@ -190,6 +190,142 @@ def _render_column_charts(
                 st.altair_chart(outlier_chart, use_container_width=True)
                 break
 
+    # Time-series visualization (for time-series anomaly findings)
+    timeseries_findings = [f for f in findings if f.ghost_type == "timeseries_anomaly"]
+    if timeseries_findings and is_numeric:
+        st.subheader("Time-Series Anomalies")
+
+        for finding in timeseries_findings:
+            if (
+                finding.ghost_type == "timeseries_anomaly"
+                and "datetime_column" in finding.metadata
+            ):
+                datetime_col = finding.metadata["datetime_column"]
+
+                # Check if datetime column exists
+                if (
+                    datetime_col not in df.columns
+                    if backend == "pandas"
+                    else datetime_col not in df.schema
+                ):
+                    continue
+
+                # Prepare time-series data
+                if backend == "pandas":
+                    ts_data = df[[datetime_col, column]].copy()
+                    ts_data[datetime_col] = pd.to_datetime(ts_data[datetime_col])
+                    ts_data = ts_data.sort_values(by=datetime_col).dropna()
+                else:
+                    import polars as pl
+
+                    ts_data = (
+                        df.select([pl.col(datetime_col), pl.col(column)])
+                        .with_columns(pl.col(datetime_col).str.to_datetime())
+                        .sort(datetime_col)
+                        .drop_nulls()
+                        .to_pandas()
+                    )
+                    ts_data[datetime_col] = pd.to_datetime(ts_data[datetime_col])
+
+                if len(ts_data) == 0:
+                    continue
+
+                # Mark anomalies
+                if finding.row_indices is not None and backend == "pandas":
+                    # For Pandas, use row indices
+                    ts_data["is_anomaly"] = ts_data.index.isin(finding.row_indices)
+                else:
+                    # For Polars or when indices not available, mark based on z-score
+                    # This is a simplified approach
+                    mean_val = ts_data[column].mean()
+                    std_val = ts_data[column].std()
+                    if std_val > 0:
+                        z_scores = (ts_data[column] - mean_val).abs() / std_val
+                        ts_data["is_anomaly"] = z_scores > finding.metadata.get(
+                            "sensitivity", 3.0
+                        )
+                    else:
+                        ts_data["is_anomaly"] = False
+
+                # Create time-series line chart
+                line_chart = (
+                    alt.Chart(ts_data)
+                    .mark_line(point=True)
+                    .encode(
+                        x=alt.X(
+                            f"{datetime_col}:T",
+                            title="Time",
+                            axis=alt.Axis(format="%Y-%m-%d"),
+                        ),
+                        y=alt.Y(f"{column}:Q", title=column),
+                        color=alt.Color(
+                            "is_anomaly:N",
+                            scale=alt.Scale(
+                                domain=[False, True],
+                                range=["#4a90e2", "#e74c3c"],
+                            ),
+                            legend=alt.Legend(title="Anomaly"),
+                        ),
+                    )
+                    .properties(width=700, height=400)
+                )
+
+                # Highlight anomalies with larger points
+                anomaly_points = (
+                    alt.Chart(ts_data[ts_data["is_anomaly"]])
+                    .mark_circle(size=100, color="#e74c3c")
+                    .encode(
+                        x=alt.X(f"{datetime_col}:T"),
+                        y=alt.Y(f"{column}:Q"),
+                    )
+                )
+
+                timeseries_chart = line_chart + anomaly_points
+                st.altair_chart(timeseries_chart, use_container_width=True)
+
+                # Show method info
+                method = finding.metadata.get("method", "unknown")
+                st.caption(
+                    f"Detection method: {method} | Sensitivity: {finding.metadata.get('sensitivity', 'N/A')}"
+                )
+                break
+
+    # ML anomaly visualization
+    ml_anomaly_findings = [f for f in findings if f.ghost_type == "ml_anomaly"]
+    if ml_anomaly_findings and is_numeric:
+        st.subheader("ML-Detected Anomalies")
+
+        for finding in ml_anomaly_findings:
+            if finding.ghost_type == "ml_anomaly":
+                algorithm = finding.metadata.get("algorithm", "unknown")
+                columns_analyzed = finding.metadata.get("columns_analyzed", [])
+                anomaly_scores = finding.metadata.get("anomaly_scores")
+
+                st.write(f"**Algorithm:** {algorithm}")
+                st.write(f"**Columns Analyzed:** {', '.join(columns_analyzed[:5])}")
+                if len(columns_analyzed) > 5:
+                    st.write(f"*and {len(columns_analyzed) - 5} more columns*")
+
+                # Show anomaly score distribution if available
+                if anomaly_scores and len(anomaly_scores) > 0:
+                    score_data = pd.DataFrame({"anomaly_score": anomaly_scores})
+
+                    score_chart = (
+                        alt.Chart(score_data)
+                        .mark_bar()
+                        .encode(
+                            x=alt.X(
+                                "anomaly_score:Q",
+                                bin=alt.Bin(maxbins=30),
+                                title="Anomaly Score",
+                            ),
+                            y=alt.Y("count():Q", title="Count"),
+                        )
+                        .properties(width=600, height=300)
+                    )
+                    st.altair_chart(score_chart, use_container_width=True)
+                break
+
     # Type distribution (for object/string columns)
     type_findings = [f for f in findings if f.ghost_type == "type"]
     if type_findings and not is_numeric:
