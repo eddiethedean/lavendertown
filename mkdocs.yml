@@ -97,6 +97,7 @@ nav:
   - API Reference:
     - Inspector: api-reference/inspector.md
     - Models: api-reference/models.md
+    - Configuration: api-reference/config.md
     - Detectors:
       - Base: api-reference/detectors/base.md
       - Null: api-reference/detectors/null.md

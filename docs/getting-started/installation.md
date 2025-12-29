@@ -31,6 +31,19 @@ pip install lavendertown[great_expectations]
 
 **Note:** LavenderTown is compatible with both altair 4.x and 5.x. Installing Great Expectations will automatically install altair 4.x (which is compatible with LavenderTown).
 
+### Enhanced CLI
+
+For the best CLI experience with beautiful terminal output:
+
+```bash
+pip install lavendertown[cli]
+```
+
+This includes:
+- **Rich**: Progress bars, formatted tables, and color-coded messages
+- **python-dotenv**: Configuration management via `.env` files
+- **orjson**: Fast JSON serialization (2-3x faster than standard library)
+
 ### ML and Time-Series Features
 
 For machine learning-based anomaly detection and time-series analysis:
@@ -51,6 +64,7 @@ pip install lavendertown[all]
 This includes:
 - Polars support
 - Pandera and Great Expectations exports
+- Enhanced CLI (Rich, python-dotenv, orjson)
 - ML anomaly detection (scikit-learn)
 - Time-series analysis (statsmodels)
 

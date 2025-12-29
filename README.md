@@ -18,9 +18,10 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - 📤 **Exportable findings** - Download results as JSON or CSV with one click
 - 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets
 - ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI
-- 🚀 **High Performance** - Optimized for datasets up to millions of rows
-- 🛠️ **CLI Tool** - Batch processing and automation from the command line
+- 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
+- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation
 - 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations
+- ⚙️ **Configuration Management** - Environment-based configuration with `.env` file support
 
 ## 📦 Installation
 
@@ -162,7 +163,7 @@ Create custom rules through the Streamlit UI:
 
 ### Command-Line Interface (CLI)
 
-LavenderTown includes a powerful CLI for batch processing and automation:
+LavenderTown includes a powerful CLI with beautiful, interactive output for batch processing and automation. The CLI features progress bars, formatted tables, and color-coded messages for an enhanced user experience:
 
 ```bash
 # Analyze a single CSV file
@@ -186,7 +187,14 @@ lavendertown export-rules rules.json --format great_expectations --output-file s
 - `--output-file PATH`: Specific output file path (overrides output-dir)
 - `--backend [pandas|polars]`: DataFrame backend (default: `pandas`)
 - `--quiet`: Suppress progress output
-- `--verbose`: Verbose output
+- `--verbose`: Verbose output with detailed error messages
+
+**Note:** For the best CLI experience with enhanced formatting, install with the `cli` extra:
+```bash
+pip install lavendertown[cli]
+```
+
+This includes Rich for beautiful terminal output, python-dotenv for configuration management, and orjson for faster JSON processing.
 
 **Example CLI Usage:**
 
@@ -291,7 +299,19 @@ LavenderTown is built with a plugin-based architecture:
   - `OutlierGhostDetector`: Finds statistical outliers using IQR method
   - `RuleBasedDetector`: Executes custom user-defined rules
 - **UI Components**: Streamlit-native visualization components
-- **Export Layer**: JSON and CSV export functionality
+- **Export Layer**: Fast JSON and CSV export functionality (with orjson optimization)
+
+## ⚙️ Configuration
+
+LavenderTown supports configuration through environment variables and `.env` files. Create a `.env` file in your project root or home directory:
+
+```bash
+# .env file example
+LAVENDERTOWN_LOG_LEVEL=INFO
+LAVENDERTOWN_OUTPUT_DIR=./results
+```
+
+Configuration is automatically loaded when the package is imported. See the [documentation](https://lavendertown.readthedocs.io/en/latest/) for available configuration options.
 
 ## 🛠️ Development
 

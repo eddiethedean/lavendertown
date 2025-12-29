@@ -39,6 +39,7 @@ python benchmarks/benchmark_inspector.py
 2. **Progress Indicators**: Visual feedback for long-running operations
 3. **Vectorized Operations**: Detectors use vectorized pandas/polars operations
 4. **Early Exit**: Some detectors skip columns when conditions aren't met
+5. **Fast JSON Serialization**: Uses `orjson` for 2-3x faster JSON export when available (via `lavendertown[cli]`)
 
 ### Recommendations
 

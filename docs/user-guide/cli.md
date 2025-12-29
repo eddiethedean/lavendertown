@@ -1,6 +1,6 @@
 # Command-Line Interface
 
-LavenderTown includes a powerful CLI for batch processing and automation.
+LavenderTown includes a powerful CLI with beautiful, interactive output for batch processing and automation. The CLI features progress bars, formatted tables, and color-coded messages for an enhanced user experience.
 
 ## Installation
 
@@ -9,6 +9,17 @@ The CLI is installed automatically with LavenderTown:
 ```bash
 pip install lavendertown
 ```
+
+For the best CLI experience with enhanced formatting, install with the `cli` extra:
+
+```bash
+pip install lavendertown[cli]
+```
+
+This includes:
+- **Rich**: Beautiful terminal output with progress bars, tables, and color-coded messages
+- **python-dotenv**: Configuration management via `.env` files
+- **orjson**: Fast JSON serialization (2-3x faster than standard library)
 
 Verify installation:
 
@@ -129,7 +140,7 @@ lavendertown import-report report.json
 
 ### JSON
 
-Structured JSON output with all finding details:
+Structured JSON output with all finding details. When `orjson` is installed (via `lavendertown[cli]`), JSON serialization is 2-3x faster than the standard library:
 
 ```json
 {
@@ -209,13 +220,35 @@ jobs:
       - run: lavendertown analyze data.csv --output-format json
 ```
 
+## Enhanced Output
+
+When installed with the `[cli]` extra, the CLI provides enhanced visual output:
+
+- **Progress bars**: Real-time progress indicators for batch processing
+- **Formatted tables**: Beautiful tables for displaying findings summaries
+- **Color-coded messages**: Green for success, yellow for warnings, red for errors
+- **Status indicators**: Clear visual feedback during long-running operations
+
+Example output with Rich formatting:
+
+```
+[cyan]Loading data from data.csv...
+[green]Analyzing 1000 rows...
+[green]Found 5 data quality issues
+[green]Results saved to data_findings.json
+```
+
+Use `--quiet` to suppress enhanced output if needed for automation scripts.
+
 ## Best Practices
 
-1. **Use output directories**: Organize results in dedicated directories
-2. **Specify output format**: Choose JSON for structured data, CSV for tabular
-3. **Use Polars for large files**: Better performance with `--backend polars`
-4. **Automate with scripts**: Create shell scripts for regular checks
-5. **Integrate with CI/CD**: Add quality checks to your pipeline
+1. **Install CLI extras**: Use `pip install lavendertown[cli]` for best experience
+2. **Use output directories**: Organize results in dedicated directories
+3. **Specify output format**: Choose JSON for structured data, CSV for tabular
+4. **Use Polars for large files**: Better performance with `--backend polars`
+5. **Automate with scripts**: Create shell scripts for regular checks
+6. **Integrate with CI/CD**: Add quality checks to your pipeline
+7. **Use --quiet for automation**: Suppress progress output in CI/CD pipelines
 
 ## Next Steps
 

@@ -13,9 +13,10 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **Exportable findings** - Download results as JSON or CSV with one click
 - **Dataset Comparison** - Detect schema and distribution drift between datasets
 - **Custom Rules** - Create and manage custom data quality rules via UI
-- **High Performance** - Optimized for datasets up to millions of rows
-- **CLI Tool** - Batch processing and automation from the command line
+- **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization
+- **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing
 - **Ecosystem Integration** - Export rules to Pandera and Great Expectations
+- **Configuration Management** - Environment-based configuration with `.env` file support
 
 ## Quick Start
 
@@ -49,6 +50,9 @@ pip install lavendertown[polars]
 # Ecosystem integrations
 pip install lavendertown[pandera]
 pip install lavendertown[great_expectations]
+
+# Enhanced CLI with Rich formatting
+pip install lavendertown[cli]
 
 # ML and time-series features
 pip install lavendertown[ml]

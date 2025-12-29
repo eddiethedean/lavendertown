@@ -107,6 +107,41 @@ df_polars = pl.DataFrame({"value": [1, 2, 3]})
 inspector = Inspector(df_polars)  # Automatically uses Polars backend
 ```
 
+## Configuration
+
+LavenderTown supports configuration through environment variables and `.env` files. Configuration is automatically loaded when the package is imported.
+
+### Environment Variables
+
+Create a `.env` file in your project root or home directory:
+
+```bash
+# .env file
+LAVENDERTOWN_LOG_LEVEL=INFO
+LAVENDERTOWN_OUTPUT_DIR=./results
+```
+
+The package searches for `.env` files in:
+1. Current directory
+2. Parent directories (up to project root)
+3. Home directory (as `.lavendertown.env`)
+
+### Using Configuration
+
+```python
+from lavendertown.config import get_config, get_config_bool, get_config_int
+
+# Get configuration values
+log_level = get_config("LAVENDERTOWN_LOG_LEVEL", "WARNING")
+output_dir = get_config("LAVENDERTOWN_OUTPUT_DIR", "./output")
+
+# Get typed values
+debug_mode = get_config_bool("LAVENDERTOWN_DEBUG", False)
+max_rows = get_config_int("LAVENDERTOWN_MAX_ROWS", 1000000)
+```
+
+Configuration is automatically loaded when you import LavenderTown, so no additional setup is required.
+
 ## Next Steps
 
 - Learn about [Detectors](detectors.md) for different detection methods
