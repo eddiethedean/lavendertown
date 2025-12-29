@@ -1,7 +1,7 @@
 # Data Profiling
 
 !!! info "Version"
-    Data profiling with ydata-profiling was introduced in **v0.6.0**.
+    Data profiling with ydata-profiling was introduced in **v0.5.0**.
 
 LavenderTown integrates with ydata-profiling (formerly pandas-profiling) to generate comprehensive HTML profiling reports for your datasets.
 

@@ -1,7 +1,7 @@
 # Time-Series Anomaly Detection
 
 !!! info "Version"
-    Time-series anomaly detection was introduced in **v0.5.0**. Change point detection with Ruptures was added in **v0.6.0**.
+    Time-series anomaly detection was introduced in **v0.2.0**. Change point detection with Ruptures was added in **v0.5.0**.
 
 LavenderTown includes specialized detectors for identifying anomalies in time-series data.
 

@@ -1,7 +1,7 @@
 # ML Anomaly Detection
 
 !!! info "Version"
-    ML anomaly detection with scikit-learn (Isolation Forest, LOF, One-Class SVM) was introduced in **v0.5.0**. PyOD integration with 40+ algorithms was added in **v0.6.0**.
+    ML anomaly detection with scikit-learn (Isolation Forest, LOF, One-Class SVM) was introduced in **v0.2.0**. PyOD integration with 40+ algorithms was added in **v0.5.0**.
 
 LavenderTown uses machine learning algorithms to detect complex anomalies that may not be obvious with statistical methods.
 

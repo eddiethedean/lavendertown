@@ -1,7 +1,7 @@
 # Drift Detection
 
 !!! info "Version"
-    Drift detection was introduced in **v0.3.0**. Statistical tests (Kolmogorov-Smirnov, chi-square) were added in **v0.6.0**.
+    Drift detection was introduced in **v0.2.0**. Statistical tests (Kolmogorov-Smirnov, chi-square) were added in **v0.5.0**.
 
 LavenderTown can compare two datasets to detect schema and distribution changes, helping you monitor data quality over time.
 
