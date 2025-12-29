@@ -93,7 +93,8 @@ if not is_valid:
     # Handle validation failure
 else:
     # Proceed with processing
-    process_data(df)
+    # process_data(df)  # Your data processing function here
+    print("✅ Data validated, proceeding with processing...")
 ```
 
 ### Pattern 3: Dataset Monitoring with Drift Detection
@@ -486,8 +487,9 @@ def etl_pipeline(input_file: str, output_file: str):
         # Log report, send alert, etc.
         return False
     
-    # Process
-    processed_df = transform_data(df)
+    # Process (replace with your transformation logic)
+    # processed_df = transform_data(df)
+    processed_df = df  # Placeholder: replace with your transformation
     
     # Save
     processed_df.to_csv(output_file, index=False)

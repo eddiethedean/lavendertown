@@ -403,9 +403,9 @@ inspector = Inspector(df_sample)
 sample_findings = inspector.detect()
 
 # If needed, analyze full dataset
-if needs_full_analysis:
-    inspector_full = Inspector(df_full)
-    findings = inspector_full.detect()
+# if needs_full_analysis:
+#     inspector_full = Inspector(df_full)
+#     findings = inspector_full.detect()
 ```
 
 ### Very Large Datasets (>1M rows)
