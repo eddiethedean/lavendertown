@@ -6,6 +6,8 @@
 
 LavenderTown has successfully completed **Phase 0**, **Phase 1 (MVP)**, **Phase 2 (Power Features)**, **Phase 3 (Ecosystem Integration)**, and **Phase 4 (Advanced Ghosts)**. The project is production-ready with comprehensive features including custom rules, drift detection, CLI tools, ecosystem integrations (Pandera, Great Expectations), time-series anomaly detection, cross-column validation, ML-assisted anomaly detection, and collaboration features.
 
+Based on comprehensive research into Python packages that could enhance LavenderTown (see `docs/RESEARCH_PYTHON_PACKAGES.md`), three new phases have been identified: **Phase 5 (Quick Wins)**, **Phase 6 (Feature Enhancements)**, and **Phase 7 (Advanced Integrations)**.
+
 ---
 
 ## Phase 0 — Foundations ✅ **COMPLETE**
@@ -79,6 +81,60 @@ LavenderTown has successfully completed **Phase 0**, **Phase 1 (MVP)**, **Phase 
 
 ---
 
+## Phase 5 — Quick Wins 🔄 **PLANNED**
+
+Based on research recommendations from `docs/RESEARCH_PYTHON_PACKAGES.md`, these high-impact, low-effort enhancements will improve developer experience and performance.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Rich CLI output enhancement | ⏳ Planned | Enhance CLI output with tables, progress bars, and beautiful formatting. Replace basic print statements with Rich's formatting capabilities. |
+| orjson JSON serialization | ⏳ Planned | Replace standard library `json` with `orjson` for 2-3x faster JSON export. Drop-in replacement in `lavendertown/export/json.py`. |
+| Hypothesis property-based testing | ⏳ Planned | Add Hypothesis tests for core detectors to improve test coverage with diverse input generation. Create property-based tests for edge cases. |
+| python-dotenv configuration | ⏳ Planned | Add support for `.env` files for configuration management. Load environment variables for API keys, database URLs, and other settings. |
+
+**Status:** Phase 5 focuses on quick wins that provide immediate value with minimal integration effort. All packages are MIT/BSD licensed and well-maintained.
+
+**Estimated Timeline:** 1-2 weeks
+
+---
+
+## Phase 6 — Feature Enhancements 🔄 **PLANNED**
+
+Strategic additions that expand LavenderTown's capabilities and improve user experience.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Typer CLI framework | ⏳ Planned | Migrate CLI to Typer (gradual migration from Click). Maintain backward compatibility. Modern type-hint based CLI with automatic help generation. |
+| PyOD anomaly detection | ⏳ Planned | Integrate PyOD library to add 40+ additional ML anomaly detection algorithms beyond scikit-learn. Expand `MLAnomalyDetector` with algorithms like ABOD, CBLOF, and more. |
+| Ruptures change point detection | ⏳ Planned | Add change point detection detector for time-series data. New detector type to identify sudden changes in data distributions over time. |
+| PyArrow Parquet export | ⏳ Planned | Add Parquet export format using PyArrow. Efficient columnar storage format for large datasets and findings. Extends export capabilities beyond JSON/CSV. |
+| Faker test data generation | ⏳ Planned | Integrate Faker for realistic test data generation. Use in examples, test fixtures, and documentation. Improve example quality and test coverage. |
+| ydata-profiling integration | ⏳ Planned | Optional advanced data profiling reports. Generate comprehensive HTML reports with statistics, distributions, and correlations. Make available as optional feature. |
+
+**Status:** Phase 6 enhances core functionality with strategic package integrations. Focuses on expanding detection capabilities, export formats, and overall feature set.
+
+**Estimated Timeline:** 4-6 weeks
+
+---
+
+## Phase 7 — Advanced Integrations 🔄 **PLANNED**
+
+Advanced features and integrations for enhanced visualization, analysis, and infrastructure capabilities.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Plotly interactive visualizations | ⏳ Planned | Add Plotly as optional visualization backend. Keep Altair as default. Enable interactive charts (zoom, pan, hover) for time-series and 3D outlier visualizations. |
+| tsfresh time-series features | ⏳ Planned | Integrate tsfresh for advanced time-series feature extraction. Extract 700+ time-series features for ML-based anomaly detection. Enhance `TimeSeriesAnomalyDetector`. |
+| Streamlit Extras UI components | ⏳ Planned | Add Streamlit Extras components for enhanced UI. Better tables, badges, card layouts, and additional widgets. Polish the user interface. |
+| SQLAlchemy database backend | ⏳ Planned | Add database backend option for collaboration features. Replace file-based storage with SQLAlchemy (SQLite for local, PostgreSQL for multi-user). Enable querying and filtering of historical reports. |
+| Joblib parallel detector execution | ⏳ Planned | Add parallel execution of detectors for large datasets using Joblib. Speed up analysis by running independent detectors concurrently. |
+
+**Status:** Phase 7 focuses on advanced features that enhance visualization capabilities, analysis depth, and infrastructure. Some features depend on user demand (e.g., SQLAlchemy if collaboration expands).
+
+**Estimated Timeline:** 6-8 weeks
+
+---
+
 ## Success Metrics Progress
 
 | Metric | Target | Status | Notes |
@@ -121,13 +177,19 @@ LavenderTown has successfully completed **Phase 0**, **Phase 1 (MVP)**, **Phase 
 
 ## Next Recommended Steps
 
-### Future Enhancements (Post-Phase 4)
+### Immediate Next Steps
+1. Begin Phase 5 implementation (Quick Wins) - highest value, lowest effort
+2. Review and prioritize Phase 6 features based on user feedback
+3. Monitor community requests for Phase 7 advanced features
+
+### Future Enhancements (Post-Phase 7)
 1. Cloud-based collaboration storage integration
 2. Real-time collaboration features (WebSocket-based)
 3. Advanced ML models (deep learning, autoencoders)
-4. Time-series forecasting integration
+4. Time-series forecasting integration (Prophet)
 5. Automated rule suggestion based on ML findings
 6. Performance benchmarking and optimization for large-scale datasets
+7. Dask integration for cluster-scale deployments (if needed)
 
 ---
 
@@ -138,10 +200,13 @@ LavenderTown has successfully completed **Phase 0**, **Phase 1 (MVP)**, **Phase 
 - **Phase 2 (Power Features):** ✅ 100% Complete (5/5 items)
 - **Phase 3 (Ecosystem):** ✅ 100% Complete (4/4 items)
 - **Phase 4 (Advanced):** ✅ 100% Complete (4/4 items)
+- **Phase 5 (Quick Wins):** ⏳ Planned (0/4 items)
+- **Phase 6 (Feature Enhancements):** ⏳ Planned (0/6 items)
+- **Phase 7 (Advanced Integrations):** ⏳ Planned (0/5 items)
 
-**Overall Project Progress:** 100% of planned roadmap items completed
+**Overall Project Progress:** 100% of original roadmap items completed. New phases identified through package research.
 
-**Production Readiness:** All phases are complete and production-ready. The package includes:
+**Production Readiness:** Phases 0-4 are complete and production-ready. The package includes:
 - Core data quality detection (nulls, types, outliers)
 - Custom rule authoring and execution
 - Dataset drift detection
@@ -153,4 +218,6 @@ LavenderTown has successfully completed **Phase 0**, **Phase 1 (MVP)**, **Phase 
 - Collaboration features (annotations, shareable reports)
 - Full Streamlit UI with comprehensive visualizations
 - Deployment documentation for Streamlit Cloud
+
+**Future Enhancements:** Phases 5-7 are planned based on comprehensive package research (see `docs/RESEARCH_PYTHON_PACKAGES.md`). These phases will enhance performance, expand features, and improve developer experience.
 

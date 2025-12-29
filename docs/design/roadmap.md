@@ -37,20 +37,47 @@
 - ML-assisted anomaly detection
 - Collaboration features
 
+## Phase 5 — Quick Wins 🔄 PLANNED
+
+Based on research recommendations (see `docs/RESEARCH_PYTHON_PACKAGES.md`):
+
+- Rich CLI output enhancement
+- orjson JSON serialization
+- Hypothesis property-based testing
+- python-dotenv configuration
+
+## Phase 6 — Feature Enhancements 🔄 PLANNED
+
+- Typer CLI framework migration
+- PyOD anomaly detection
+- Ruptures change point detection
+- PyArrow Parquet export
+- Faker test data generation
+- ydata-profiling integration
+
+## Phase 7 — Advanced Integrations 🔄 PLANNED
+
+- Plotly interactive visualizations
+- tsfresh time-series features
+- Streamlit Extras UI components
+- SQLAlchemy database backend
+- Joblib parallel detector execution
+
 ## Success Metrics
 
 - ✅ <5 lines to usable dashboard
 - ⚠️ Sub-2s load for 100k rows (varies by system)
 - ✅ Clear ghost explanations
 
-## Future Enhancements
+## Future Enhancements (Post-Phase 7)
 
 - Cloud-based collaboration storage integration
 - Real-time collaboration features (WebSocket-based)
 - Advanced ML models (deep learning, autoencoders)
-- Time-series forecasting integration
+- Time-series forecasting integration (Prophet)
 - Automated rule suggestion based on ML findings
 - Performance benchmarking and optimization for large-scale datasets
+- Dask integration for cluster-scale deployments
 
 ## Stretch Ideas
 
