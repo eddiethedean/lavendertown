@@ -18,6 +18,8 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets
 - ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI
 - 🚀 **High Performance** - Optimized for datasets up to millions of rows
+- 🛠️ **CLI Tool** - Batch processing and automation from the command line
+- 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations
 
 ## 📦 Installation
 
@@ -32,6 +34,15 @@ For Polars support, install with the optional dependency:
 ```bash
 pip install lavendertown[polars]
 ```
+
+For ecosystem integrations (Pandera and Great Expectations), install with:
+
+```bash
+pip install lavendertown[pandera]
+pip install lavendertown[great_expectations]
+```
+
+**Note:** LavenderTown is compatible with both altair 4.x and 5.x. Installing Great Expectations will automatically install altair 4.x (which is compatible with LavenderTown).
 
 ## 🚀 Quick Start
 
@@ -95,8 +106,19 @@ Compare datasets to detect schema and distribution changes:
 from lavendertown import Inspector
 import pandas as pd
 
-baseline_df = pd.read_csv("baseline.csv")
-current_df = pd.read_csv("current.csv")
+# Create baseline and current datasets
+baseline_df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5],
+    "age": [25, 30, 35, 40, 45],
+    "purchase_amount": [100.50, 200.00, 150.75, 300.00, 250.50],
+})
+
+current_df = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5, 6],  # New row
+    "age": [25, 30, 35, 40, 45, 50],  # New row
+    "purchase_amount": [100.50, 250.00, 150.75, 400.00, 250.50, 500.00],  # Changed values
+    "new_column": [1, 2, 3, 4, 5, 6],  # New column
+})
 
 inspector = Inspector(current_df)
 drift_findings = inspector.compare_with_baseline(
@@ -108,7 +130,22 @@ drift_findings = inspector.compare_with_baseline(
 for finding in drift_findings:
     if finding.ghost_type == "drift":
         print(f"{finding.column}: {finding.description}")
+        print(f"  Change type: {finding.metadata.get('change_type', 'N/A')}")
 ```
+
+**Example Output:**
+```
+new_column: New column 'new_column' added to dataset
+  Change type: column_added
+email: Column 'email' became nullable
+  Change type: nullability_change
+age: Column 'age' range shifted from [25.00, 45.00] to [25.00, 50.00]
+  Change type: numeric_range
+purchase_amount: Column 'purchase_amount' range shifted from [100.50, 300.00] to [100.50, 500.00]
+  Change type: numeric_range
+```
+
+> **Note:** This is actual output from running the code above. The exact drift findings depend on the differences between your baseline and current datasets.
 
 ### Custom Data Quality Rules
 
@@ -122,15 +159,66 @@ Create custom rules through the Streamlit UI:
 3. Rules execute automatically with each analysis
 4. Export/import rules as JSON for reuse across projects
 
+### Command-Line Interface (CLI)
+
+LavenderTown includes a powerful CLI for batch processing and automation:
+
+```bash
+# Analyze a single CSV file
+lavendertown analyze data.csv --output-format json --output-dir results/
+
+# Batch process multiple files
+lavendertown analyze-batch data/ --output-dir results/
+
+# Compare datasets for drift detection
+lavendertown compare baseline.csv current.csv --output-format json
+
+# Export rules to Pandera or Great Expectations
+lavendertown export-rules rules.json --format pandera --output-file schema.py
+lavendertown export-rules rules.json --format great_expectations --output-file suite.json
+```
+
+**CLI Options:**
+- `--rules PATH`: Path to rules JSON file
+- `--output-format [json|csv]`: Output format (default: `json`)
+- `--output-dir DIRECTORY`: Output directory (for batch processing)
+- `--output-file PATH`: Specific output file path (overrides output-dir)
+- `--backend [pandas|polars]`: DataFrame backend (default: `pandas`)
+- `--quiet`: Suppress progress output
+- `--verbose`: Verbose output
+
+**Example CLI Usage:**
+
+```bash
+# Analyze with verbose output
+lavendertown analyze data.csv --verbose
+
+# Batch process with Polars backend
+lavendertown analyze-batch data/ --output-dir results/ --backend polars
+
+# Analyze with custom rules
+lavendertown analyze data.csv --rules my_rules.json --output-format csv
+```
+
+See `lavendertown --help` or `lavendertown analyze --help` for full documentation.
+
 ### Programmatic Usage
 
 Use LavenderTown in your Python scripts:
 
 ```python
-from lavendertown import Inspector, GhostFinding
+from lavendertown import Inspector
 import pandas as pd
 
-df = pd.read_csv("data.csv")
+# Create sample data with quality issues
+data = {
+    "product_id": [1, 2, 3, 4, 5, 6, 7, 8],
+    "price": [10.99, 25.50, None, 45.00, -5.00, 100.00, 200.00, 300.00],
+    "quantity": [100, 50, 75, None, 200, 150, 0, 300],
+    "category": ["A", "B", "A", "C", "A", "B", "A", "C"],
+}
+df = pd.DataFrame(data)
+
 inspector = Inspector(df)
 
 # Get findings programmatically
@@ -139,15 +227,40 @@ findings = inspector.detect()
 # Filter by severity
 errors = [f for f in findings if f.severity == "error"]
 warnings = [f for f in findings if f.severity == "warning"]
+info_items = [f for f in findings if f.severity == "info"]
+
+print(f"Total findings: {len(findings)}")
+print(f"Errors: {len(errors)}, Warnings: {len(warnings)}, Info: {len(info_items)}")
 
 # Access finding details
-for finding in errors:
-    print(f"Column: {finding.column}")
+for finding in findings:
+    print(f"\nColumn: {finding.column}")
     print(f"Type: {finding.ghost_type}")
+    print(f"Severity: {finding.severity}")
     print(f"Description: {finding.description}")
     if finding.row_indices:
         print(f"Affected rows: {len(finding.row_indices)}")
 ```
+
+**Example Output:**
+```
+Total findings: 2
+Errors: 0, Warnings: 0, Info: 2
+
+Column: price
+Type: null
+Severity: info
+Description: Column 'price' has 1 null values (12.5% of 8 rows)
+Affected rows: 1
+
+Column: quantity
+Type: null
+Severity: info
+Description: Column 'quantity' has 1 null values (12.5% of 8 rows)
+Affected rows: 1
+```
+
+> **Note:** This is actual output from running the code above. The exact findings may vary based on the data and detection thresholds.
 
 ## 👻 Ghost Categories
 

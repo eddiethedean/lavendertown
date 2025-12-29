@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lavendertown"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Streamlit-first Python package for detecting and visualizing data quality issues"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,7 +26,8 @@ classifiers = [
 dependencies = [
     "streamlit>=1.28.0",
     "pandas>=1.5.0",
-    "altair>=5.0.0",
+    "altair>=4.2.1",
+    "click>=8.0.0",
 ]
 
 [project.optional-dependencies]
@@ -40,6 +41,17 @@ dev = [
 polars = [
     "polars>=0.19.0",
 ]
+pandera = [
+    "pandera>=0.18.0",
+]
+great_expectations = [
+    "great-expectations>=0.18.0",
+]
+# Note: Installing great_expectations will automatically install altair 4.x
+# LavenderTown is compatible with both altair 4.x and 5.x
+
+[project.scripts]
+lavendertown = "lavendertown.cli:cli"
 
 [project.urls]
 Homepage = "https://github.com/eddiethedean/lavendertown"
@@ -85,4 +97,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+# Enable doctest discovery and execution
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+addopts = "--doctest-modules"
 

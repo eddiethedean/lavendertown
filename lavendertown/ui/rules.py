@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from lavendertown.logging_config import get_logger
 from lavendertown.rules.executors import EnumRule, RangeRule, RegexRule
 from lavendertown.rules.models import Rule, RuleSet
 from lavendertown.rules.storage import ruleset_from_json, ruleset_to_json
+
+logger = get_logger(__name__)
 
 
 def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
@@ -82,7 +85,9 @@ def render_rule_editor(st: object, columns: list[str]) -> Rule | None:
             if allowed_values:
                 rule_params["allowed_values"] = allowed_values
             else:
-                st.warning("Please provide at least one allowed value")
+                st.warning(
+                    "Please provide at least one allowed value (empty lines are ignored)"
+                )
         else:
             st.warning("Please provide allowed values")
 
@@ -213,11 +218,11 @@ def create_rule_executor(rule: Rule) -> RangeRule | RegexRule | EnumRule | None:
     return None
 
 
-def execute_ruleset(st: object, ruleset: RuleSet, df: object) -> list:
+def execute_ruleset(st: object | None, ruleset: RuleSet, df: object) -> list:
     """Execute all enabled rules in a ruleset and return findings.
 
     Args:
-        st: Streamlit module
+        st: Streamlit module (optional, for error reporting in UI)
         ruleset: RuleSet to execute
         df: DataFrame to check
 
@@ -238,7 +243,16 @@ def execute_ruleset(st: object, ruleset: RuleSet, df: object) -> list:
                 all_findings.extend(findings)
             except Exception as e:
                 # Log error but continue
-                st.warning(f"Error executing rule '{rule.name}': {e}")
+                if st is not None:
+                    st.warning(f"Error executing rule '{rule.name}': {e}")
+                else:
+                    # In CLI context, log the error
+                    logger.error(
+                        "Error executing rule '%s': %s",
+                        rule.name,
+                        str(e),
+                        exc_info=True,
+                    )
 
     return all_findings
 

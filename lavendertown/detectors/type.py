@@ -1,4 +1,10 @@
-"""Type ghost detector - detects type inconsistencies and schema issues."""
+"""Type ghost detector - detects type inconsistencies and schema issues.
+
+This module provides the TypeGhostDetector class, which identifies columns
+with mixed data types or type coercion issues. It detects situations where
+a column contains values of different Python types, which can indicate
+data quality problems.
+"""
 
 from __future__ import annotations
 
@@ -9,17 +15,48 @@ from lavendertown.models import GhostFinding
 class TypeGhostDetector(GhostDetector):
     """Detects type inconsistencies within columns.
 
-    Identifies columns with mixed dtypes or type coercion failures.
+    This detector identifies columns with mixed data types or type coercion
+    issues. For Pandas DataFrames, it detects object dtype columns containing
+    values of different Python types. For Polars DataFrames, it identifies
+    string columns that could potentially be numeric but contain mixed content.
+
+    The detector is useful for finding columns where data has been incorrectly
+    parsed or where inconsistent data entry has occurred.
+
+    Example:
+        Detect type inconsistencies::
+
+            detector = TypeGhostDetector()
+            findings = detector.detect(df)
+
+        Findings will have ghost_type="type" and severity="warning" for
+        columns with mixed types detected.
     """
 
     def detect(self, df: object) -> list[GhostFinding]:
         """Detect type inconsistencies.
 
+        Analyzes all columns in the DataFrame to identify those with mixed
+        data types or type coercion issues. Works with both Pandas and Polars
+        DataFrames using backend-specific detection logic.
+
         Args:
-            df: DataFrame to analyze
+            df: DataFrame to analyze. Can be a pandas.DataFrame or
+                polars.DataFrame. The backend is automatically detected.
 
         Returns:
-            List of GhostFinding objects for columns with type issues
+            List of GhostFinding objects for columns with type inconsistencies.
+            Each finding includes:
+            - ghost_type: "type"
+            - column: Name of the column with type issues
+            - severity: "warning"
+            - description: Human-readable description of the type issue
+            - row_indices: None (type issues affect the column as a whole)
+            - metadata: Dictionary with dtype and type distribution information
+
+        Note:
+            This detector focuses on structural type issues rather than
+            individual row violations, so row_indices is typically None.
         """
         backend = detect_dataframe_backend(df)
 
@@ -31,7 +68,17 @@ class TypeGhostDetector(GhostDetector):
             raise ValueError(f"Unsupported backend: {backend}")
 
     def _detect_pandas(self, df: object) -> list[GhostFinding]:
-        """Detect type issues in Pandas DataFrame."""
+        """Detect type issues in Pandas DataFrame.
+
+        Internal method that performs type detection using Pandas-specific APIs.
+        Checks for object dtype columns with mixed Python types.
+
+        Args:
+            df: pandas.DataFrame to analyze.
+
+        Returns:
+            List of GhostFinding objects for columns with type inconsistencies.
+        """
 
         findings: list[GhostFinding] = []
 
@@ -79,7 +126,18 @@ class TypeGhostDetector(GhostDetector):
         return findings
 
     def _detect_polars(self, df: object) -> list[GhostFinding]:
-        """Detect type issues in Polars DataFrame."""
+        """Detect type issues in Polars DataFrame.
+
+        Internal method that performs type detection using Polars-specific APIs.
+        Checks for string columns that might contain mixed numeric and non-numeric
+        values by attempting type coercion.
+
+        Args:
+            df: polars.DataFrame to analyze.
+
+        Returns:
+            List of GhostFinding objects for columns with potential type issues.
+        """
         import polars as pl
 
         findings: list[GhostFinding] = []

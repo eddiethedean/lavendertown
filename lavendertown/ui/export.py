@@ -82,3 +82,72 @@ def render_export_section(st: object, findings: list[GhostFinding]) -> None:
                 csv_str[:1000] + "..." if len(csv_str) > 1000 else csv_str,
                 language="csv",
             )
+
+    # Rule export section (if rules exist)
+    if "ruleset" in st.session_state:
+        st.divider()
+        st.header("📋 Export Rules")
+
+        ruleset = st.session_state["ruleset"]
+        if ruleset.rules:
+            rule_col1, rule_col2 = st.columns(2)
+
+            # Pandera export
+            with rule_col1:
+                st.subheader("Pandera Schema")
+                try:
+                    from lavendertown.export.pandera import export_ruleset_to_pandera
+
+                    # Create a simple representation - for full export, users can use CLI
+                    try:
+                        schema = export_ruleset_to_pandera(ruleset)
+                        schema_repr = str(schema)
+                        st.info("✅ Pandera export available")
+                        st.code(
+                            schema_repr[:500] + "..."
+                            if len(schema_repr) > 500
+                            else schema_repr,
+                            language="python",
+                        )
+                        st.caption(
+                            "Use CLI command 'lavendertown export-rules' for full export"
+                        )
+                    except Exception as e:
+                        st.warning(f"⚠️ Pandera export error: {str(e)}")
+                except ImportError:
+                    st.info(
+                        "📦 Install Pandera to export rules: pip install lavendertown[pandera]"
+                    )
+
+            # Great Expectations export
+            with rule_col2:
+                st.subheader("Great Expectations")
+                try:
+                    from lavendertown.export.great_expectations import (
+                        export_ruleset_to_great_expectations_json,
+                    )
+
+                    try:
+                        ge_json = export_ruleset_to_great_expectations_json(ruleset)
+                        st.info("✅ Great Expectations export available")
+                        st.code(
+                            ge_json[:500] + "..." if len(ge_json) > 500 else ge_json,
+                            language="json",
+                        )
+
+                        st.download_button(
+                            label="📥 Download GE Suite (JSON)",
+                            data=ge_json,
+                            file_name="expectation_suite.json",
+                            mime="application/json",
+                            help="Download Great Expectations ExpectationSuite as JSON",
+                            key="download_ge_suite",
+                        )
+                    except Exception as e:
+                        st.warning(f"⚠️ Great Expectations export error: {str(e)}")
+                except ImportError:
+                    st.info(
+                        "📦 Install Great Expectations to export rules: pip install lavendertown[great_expectations]"
+                    )
+        else:
+            st.info("No rules defined. Create rules in the Rules panel to export them.")

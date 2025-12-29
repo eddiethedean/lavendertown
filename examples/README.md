@@ -45,7 +45,8 @@ Shows how to use LavenderTown programmatically without the Streamlit UI, perfect
 
 **Run it:**
 ```bash
-python examples/programmatic_usage.py
+# Make sure you're in the project root
+PYTHONPATH=. python examples/programmatic_usage.py
 ```
 
 **What it shows:**
@@ -53,6 +54,39 @@ python examples/programmatic_usage.py
 - Filtering findings by type and severity
 - Processing findings in your own code
 - Working without Streamlit
+
+**Example Output:**
+```
+============================================================
+Data Quality Analysis Results
+============================================================
+
+Total findings: 2
+
+By severity:
+  INFO: 2
+
+============================================================
+Detailed Findings
+============================================================
+
+INFO Issues:
+------------------------------------------------------------
+
+Column: price
+Type: null
+Description: Column 'price' has 1 null values (12.5% of 8 rows)
+Affected rows: [2]
+Count: 1
+Metadata: {'null_count': 1, 'total_count': 8, 'null_percentage': 0.125, 'threshold': 0.1}
+
+Column: quantity
+Type: null
+Description: Column 'quantity' has 1 null values (12.5% of 8 rows)
+Affected rows: [3]
+Count: 1
+Metadata: {'null_count': 1, 'total_count': 8, 'null_percentage': 0.125, 'threshold': 0.1}
+```
 
 **Key features:**
 - No Streamlit dependency for this use case
@@ -128,14 +162,25 @@ For scripts and automated workflows:
 from lavendertown import Inspector
 import pandas as pd
 
-df = pd.read_csv("data.csv")
+# Create sample data (or load from CSV)
+data = {
+    "product_id": [1, 2, 3, 4, 5],
+    "price": [10.99, 25.50, None, 45.00, -5.00],
+    "quantity": [100, 50, 75, None, 200],
+}
+df = pd.DataFrame(data)
+
 inspector = Inspector(df)
 findings = inspector.detect()
 
 # Process findings programmatically
 errors = [f for f in findings if f.severity == "error"]
+warnings = [f for f in findings if f.severity == "warning"]
+
 if errors:
     print(f"Found {len(errors)} error-level issues")
+    for error in errors:
+        print(f"  - {error.column}: {error.description}")
     # Take action...
 ```
 
@@ -147,15 +192,23 @@ For detecting changes between dataset versions:
 from lavendertown import Inspector
 import pandas as pd
 
-baseline = pd.read_csv("baseline.csv")
-current = pd.read_csv("current.csv")
+# Create example datasets (or load from CSV)
+baseline = pd.DataFrame({
+    "id": [1, 2, 3],
+    "value": [10, 20, 30],
+})
+current = pd.DataFrame({
+    "id": [1, 2, 3, 4],  # New row
+    "value": [10, 20, 30, 40],  # New row
+    "new_col": [1, 2, 3, 4],  # New column
+})
 
 inspector = Inspector(current)
 drift_findings = inspector.compare_with_baseline(baseline)
 
 for finding in drift_findings:
     if finding.ghost_type == "drift":
-        print(f"Drift detected: {finding.description}")
+        print(f"Drift detected: {finding.column} - {finding.description}")
 ```
 
 ### Pattern 4: Performance-Critical Workflows
@@ -166,10 +219,20 @@ For large datasets where performance matters:
 from lavendertown import Inspector
 import polars as pl
 
-df = pl.read_csv("large_data.csv")  # Use Polars
-inspector = Inspector(df)
-inspector.render()  # Faster analysis with Polars
+# Create example data (or load from CSV)
+data = {
+    "id": list(range(1, 1001)),
+    "value": [i * 1.5 for i in range(1, 1001)],
+    "category": [f"cat_{i % 10}" for i in range(1, 1001)],
+}
+df = pl.DataFrame(data)
+
+inspector = Inspector(df)  # Automatically detects Polars backend
+findings = inspector.detect()  # Use programmatically
+# Or use: inspector.render()  # In Streamlit context
 ```
+
+> **Note:** Install Polars support with `pip install lavendertown[polars]`
 
 ## Customizing Examples
 
