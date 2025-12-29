@@ -4,6 +4,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyPI version](https://img.shields.io/pypi/v/lavendertown.svg)](https://pypi.org/project/lavendertown/)
+[![Documentation](https://readthedocs.org/projects/lavendertown/badge/?version=latest)](https://lavendertown.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 LavenderTown helps you quickly identify data quality issues in your datasets through an intuitive, interactive Streamlit interface. Perfect for data scientists, analysts, and engineers who need to understand their data quality before diving into analysis.
@@ -353,6 +354,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## 🔗 Links
 
+- **Documentation**: https://lavendertown.readthedocs.io/en/latest/
 - **Homepage**: https://github.com/eddiethedean/lavendertown
 - **Repository**: https://github.com/eddiethedean/lavendertown
 - **Issues**: https://github.com/eddiethedean/lavendertown/issues

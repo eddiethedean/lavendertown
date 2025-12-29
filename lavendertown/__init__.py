@@ -29,7 +29,7 @@ Example:
             print(f"{finding.column}: {finding.description}")
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from lavendertown.inspector import Inspector
 from lavendertown.models import GhostFinding
