@@ -7,28 +7,28 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 ## Features
 
 !!! info "Version Information"
-    Features are marked with the PyPI version where they were introduced. See [Version Mapping](VERSION_MAPPING.md) for details.
+    See [Version Mapping](VERSION_MAPPING.md) for details on when features were introduced.
 
-- **Zero-config data quality insights** - Get started with minimal setup *(v0.1.0)*
-- **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit *(v0.1.0)*
-- **Interactive ghost detection** - Drill down into problematic rows *(v0.1.0)*
-- **Pandas & Polars support** - Works with your existing data pipelines *(Pandas: v0.1.0, Polars: v0.2.0)*
-- **Exportable findings** - Download results as JSON, CSV, or Parquet with one click *(JSON/CSV: v0.1.0, Parquet: v0.5.0)*
-- **Dataset Comparison** - Detect schema and distribution drift between datasets with statistical tests *(v0.2.0, Statistical tests: v0.5.0)*
-- **Custom Rules** - Create and manage custom data quality rules via UI *(v0.2.0)*
-- **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection *(v0.6.0)*
-- **Modular UI Components** - Flexible component system for customizing the Inspector interface *(v0.7.0)*
-- **Interactive Visualizations** - Plotly backend for interactive charts with zoom, pan, and 3D visualizations *(v0.7.0)*
-- **Advanced Time-Series Features** - tsfresh integration for 700+ time-series features and ML-based anomaly detection *(v0.7.0)*
-- **Enhanced UI Components** - Streamlit Extras integration for improved metric cards, badges, and layouts *(v0.7.0)*
-- **Database Backend** - SQLAlchemy support for scalable collaboration features with SQLite and PostgreSQL *(v0.7.0)*
-- **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization *(orjson: v0.4.0)*
-- **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer) *(Click: v0.2.0, Rich: v0.4.0, Typer: v0.5.0)*
-- **Ecosystem Integration** - Export rules to Pandera and Great Expectations *(v0.2.0)*
-- **Configuration Management** - Environment-based configuration with `.env` file support *(v0.4.0)*
-- **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration *(scikit-learn: v0.2.0, PyOD: v0.5.0)*
-- **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling reports *(Time-series: v0.2.0, Change points: v0.5.0, Profiling: v0.5.0)*
-- **Statistical Testing** - Kolmogorov-Smirnov and chi-square tests for drift detection *(v0.5.0)*
+- **[Zero-config data quality insights](user-guide/basic-usage.md)** - Get started with minimal setup
+- **[Streamlit-native UI](user-guide/basic-usage.md)** - No HTML embeds, fully integrated with Streamlit
+- **[Interactive ghost detection](user-guide/basic-usage.md)** - Drill down into problematic rows
+- **[Pandas & Polars support](user-guide/basic-usage.md#backend-detection)** - Works with your existing data pipelines
+- **[Exportable findings](user-guide/basic-usage.md)** - Download results as JSON, CSV, or Parquet with one click
+- **[Dataset Comparison](user-guide/drift-detection.md)** - Detect schema and distribution drift between datasets with statistical tests
+- **[Custom Rules](user-guide/custom-rules.md)** - Create and manage custom data quality rules via UI
+- **[Enhanced File Upload](api-reference/upload.md)** - Drag-and-drop interface with animated progress and automatic encoding detection
+- **[Modular UI Components](guides/modular-ui-components.md)** - Flexible component system for customizing the Inspector interface
+- **[Interactive Visualizations](api-reference/visualizations.md)** - Plotly backend for interactive charts with zoom, pan, and 3D visualizations
+- **[Advanced Time-Series Features](api-reference/timeseries_features.md)** - tsfresh integration for 700+ time-series features and ML-based anomaly detection
+- **[Enhanced UI Components](guides/modular-ui-components.md)** - Streamlit Extras integration for improved metric cards, badges, and layouts
+- **[Database Backend](api-reference/database_storage.md)** - SQLAlchemy support for scalable collaboration features with SQLite and PostgreSQL
+- **[High Performance](guides/performance.md)** - Optimized for datasets up to millions of rows with fast JSON serialization
+- **[Enhanced CLI Tool](user-guide/cli.md)** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer)
+- **[Ecosystem Integration](api-reference/export/pandera.md)** - Export rules to [Pandera](api-reference/export/pandera.md) and [Great Expectations](api-reference/export/great_expectations.md)
+- **[Configuration Management](api-reference/config.md)** - Environment-based configuration with `.env` file support
+- **[Advanced ML Detection](user-guide/ml-anomaly-detection.md)** - 40+ ML anomaly detection algorithms via PyOD integration
+- **[Time-Series Analysis](user-guide/time-series.md)** - Change point detection with Ruptures, comprehensive profiling reports
+- **[Statistical Testing](user-guide/drift-detection.md)** - Kolmogorov-Smirnov and chi-square tests for drift detection
 
 ## Quick Start
 
