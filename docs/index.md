@@ -10,24 +10,24 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
     See [Version Mapping](VERSION_MAPPING.md) for details on when features were introduced.
 
 - **[Zero-config data quality insights](user-guide/basic-usage.md)** - Get started with minimal setup
-- **[Streamlit-native UI](user-guide/basic-usage.md)** - No HTML embeds, fully integrated with Streamlit
+- **[Streamlit-native UI](user-guide/basic-usage.md)** - Fully integrated with Streamlit, no HTML embeds
 - **[Interactive ghost detection](user-guide/basic-usage.md)** - Drill down into problematic rows
 - **[Pandas & Polars support](user-guide/basic-usage.md#backend-detection)** - Works with your existing data pipelines
-- **[Exportable findings](user-guide/basic-usage.md)** - Download results as JSON, CSV, or Parquet with one click
-- **[Dataset Comparison](user-guide/drift-detection.md)** - Detect schema and distribution drift between datasets with statistical tests
+- **[Exportable findings](user-guide/basic-usage.md)** - Download results as JSON, CSV, or Parquet
+- **[Dataset Comparison](user-guide/drift-detection.md)** - Detect schema and distribution drift with statistical tests
 - **[Custom Rules](user-guide/custom-rules.md)** - Create and manage custom data quality rules via UI
-- **[Enhanced File Upload](api-reference/upload.md)** - Drag-and-drop interface with animated progress and automatic encoding detection
+- **[Enhanced File Upload](api-reference/upload.md)** - Drag-and-drop with animated progress and automatic encoding detection
 - **[Modular UI Components](guides/modular-ui-components.md)** - Flexible component system for customizing the Inspector interface
-- **[Interactive Visualizations](api-reference/visualizations.md)** - Plotly backend for interactive charts with zoom, pan, and 3D visualizations
-- **[Advanced Time-Series Features](api-reference/timeseries_features.md)** - tsfresh integration for 700+ time-series features and ML-based anomaly detection
-- **[Enhanced UI Components](guides/modular-ui-components.md)** - Streamlit Extras integration for improved metric cards, badges, and layouts
-- **[Database Backend](api-reference/database_storage.md)** - SQLAlchemy support for scalable collaboration features with SQLite and PostgreSQL
-- **[High Performance](guides/performance.md)** - Optimized for datasets up to millions of rows with fast JSON serialization
-- **[Enhanced CLI Tool](user-guide/cli.md)** - Beautiful, interactive CLI with progress bars and formatted output (Click and Typer)
-- **[Ecosystem Integration](api-reference/export/pandera.md)** - Export rules to [Pandera](api-reference/export/pandera.md) and [Great Expectations](api-reference/export/great_expectations.md)
-- **[Configuration Management](api-reference/config.md)** - Environment-based configuration with `.env` file support
-- **[Advanced ML Detection](user-guide/ml-anomaly-detection.md)** - 40+ ML anomaly detection algorithms via PyOD integration
-- **[Time-Series Analysis](user-guide/time-series.md)** - Change point detection with Ruptures, comprehensive profiling reports
+- **[Interactive Visualizations](api-reference/visualizations.md)** - Plotly backend with zoom, pan, and 3D visualizations
+- **[Advanced Time-Series Features](api-reference/timeseries_features.md)** - tsfresh integration for 700+ time-series features
+- **[Enhanced UI Components](guides/modular-ui-components.md)** - Streamlit Extras for improved metric cards and badges
+- **[Database Backend](api-reference/database_storage.md)** - SQLAlchemy support for SQLite and PostgreSQL
+- **[High Performance](guides/performance.md)** - Optimized for datasets up to millions of rows
+- **[Enhanced CLI Tool](user-guide/cli.md)** - Interactive CLI with progress bars and formatted output
+- **[Ecosystem Integration](api-reference/export/pandera.md)** - Export rules to Pandera and Great Expectations
+- **[Configuration Management](api-reference/config.md)** - Environment-based configuration with `.env` files
+- **[Advanced ML Detection](user-guide/ml-anomaly-detection.md)** - 40+ ML anomaly detection algorithms via PyOD
+- **[Time-Series Analysis](user-guide/time-series.md)** - Change point detection and comprehensive profiling
 - **[Statistical Testing](user-guide/drift-detection.md)** - Kolmogorov-Smirnov and chi-square tests for drift detection
 
 ## Quick Start
