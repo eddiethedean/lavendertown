@@ -16,9 +16,9 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **[Exportable findings](user-guide/basic-usage.md)** - Download results as JSON, CSV, or Parquet
 - **[Dataset Comparison](user-guide/drift-detection.md)** - Detect schema and distribution drift with statistical tests
 - **[Custom Rules](user-guide/custom-rules.md)** - Create and manage custom data quality rules via UI
-- **[Enhanced File Upload](api-reference/upload.md)** - Drag-and-drop with animated progress and automatic encoding detection
-- **[Modular UI Components](guides/modular-ui-components.md)** - Flexible component system for customizing the Inspector interface
-- **[Interactive Visualizations](api-reference/visualizations.md)** - Plotly backend with zoom, pan, and 3D visualizations
+- **[Enhanced File Upload](api-reference/upload.md)** - Drag-and-drop with animated progress and auto encoding detection
+- **[Modular UI Components](guides/modular-ui-components.md)** - Flexible component system for customizing the Inspector
+- **[Interactive Visualizations](api-reference/visualizations.md)** - Plotly backend with zoom, pan, and 3D charts
 - **[Advanced Time-Series Features](api-reference/timeseries_features.md)** - tsfresh integration for 700+ time-series features
 - **[Enhanced UI Components](guides/modular-ui-components.md)** - Streamlit Extras for improved metric cards and badges
 - **[Database Backend](api-reference/database_storage.md)** - SQLAlchemy support for SQLite and PostgreSQL
@@ -28,7 +28,7 @@ LavenderTown helps you quickly identify data quality issues in your datasets thr
 - **[Configuration Management](api-reference/config.md)** - Environment-based configuration with `.env` files
 - **[Advanced ML Detection](user-guide/ml-anomaly-detection.md)** - 40+ ML anomaly detection algorithms via PyOD
 - **[Time-Series Analysis](user-guide/time-series.md)** - Change point detection and comprehensive profiling
-- **[Statistical Testing](user-guide/drift-detection.md)** - Kolmogorov-Smirnov and chi-square tests for drift detection
+- **[Statistical Testing](user-guide/drift-detection.md)** - Kolmogorov-Smirnov and chi-square tests for drift
 
 ## Quick Start
 
