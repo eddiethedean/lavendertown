@@ -9,68 +9,32 @@
 
 LavenderTown helps you quickly identify data quality issues in your datasets through an intuitive, interactive Streamlit interface. Perfect for data scientists, analysts, and engineers who need to understand their data quality before diving into analysis.
 
-## ✨ Features
+## ✨ Key Features
 
-> **Version Info:** Features are marked with the PyPI version where they were introduced. See [Version Mapping](docs/VERSION_MAPPING.md) for details.
+- 🔍 **Zero-config data quality insights** - Get started with minimal setup
+- 📊 **Streamlit-native UI** - Fully integrated interactive dashboard
+- 🐼 **Pandas & Polars support** - Works with your existing data pipelines
+- 🎯 **Interactive detection** - Drill down into problematic rows
+- 📤 **Exportable findings** - JSON, CSV, and Parquet formats
+- 🔄 **Drift detection** - Compare datasets for schema and distribution changes
+- ⚙️ **Custom rules** - Create and manage data quality rules via UI
+- 🤖 **ML-powered detection** - 40+ anomaly detection algorithms
+- 📈 **Time-series analysis** - Advanced time-series feature extraction
+- 🚀 **High performance** - Optimized for datasets up to millions of rows
 
-- 🔍 **Zero-config data quality insights** - Get started with minimal setup *(v0.1.0)*
-- 📊 **Streamlit-native UI** - No HTML embeds, fully integrated with Streamlit *(v0.1.0)*
-- 🎯 **Interactive ghost detection** - Drill down into problematic rows *(v0.1.0)*
-- 🐼 **Pandas & Polars support** - Works with your existing data pipelines *(Pandas: v0.1.0, Polars: v0.2.0)*
-- 📤 **Exportable findings** - Download results as JSON, CSV, or Parquet with one click *(JSON/CSV: v0.1.0, Parquet: v0.5.0)*
-- 🔄 **Dataset Comparison** - Detect schema and distribution drift between datasets *(v0.2.0, Statistical tests: v0.5.0)*
-- ⚙️ **Custom Rules** - Create and manage custom data quality rules via UI *(v0.2.0)*
-- 📁 **Enhanced File Upload** - Drag-and-drop interface with animated progress and automatic encoding detection *(v0.6.0)*
-- 🚀 **High Performance** - Optimized for datasets up to millions of rows with fast JSON serialization *(orjson: v0.4.0)*
-- 🛠️ **Enhanced CLI Tool** - Beautiful, interactive CLI with progress bars and formatted output for batch processing and automation (Click and Typer support) *(Click: v0.2.0, Rich: v0.4.0, Typer: v0.5.0)*
-- 🔗 **Ecosystem Integration** - Export rules to Pandera and Great Expectations *(v0.2.0)*
-- ⚙️ **Configuration Management** - Environment-based configuration with `.env` file support *(v0.4.0)*
-- 🤖 **Advanced ML Detection** - 40+ ML anomaly detection algorithms via PyOD integration *(scikit-learn: v0.2.0, PyOD: v0.5.0)*
-- 📈 **Time-Series Analysis** - Change point detection with Ruptures, comprehensive profiling with ydata-profiling *(Time-series: v0.2.0, Change points: v0.5.0, Profiling: v0.5.0)*
-- 📊 **Statistical Tests** - Kolmogorov-Smirnov and chi-square tests for rigorous drift detection *(v0.5.0)*
-- 💾 **Parquet Export** - Efficient columnar storage format for large datasets *(v0.5.0)*
+**New in v0.7.0:** Modular UI components, Plotly interactive visualizations, tsfresh time-series features, Streamlit Extras UI, and SQLAlchemy database backend.
+
+👉 **[View all features →](https://lavendertown.readthedocs.io/en/latest/)**
 
 ## 📦 Installation
-
-Install LavenderTown using pip:
 
 ```bash
 pip install lavendertown
 ```
 
-For Polars support, install with the optional dependency:
-
-```bash
-pip install lavendertown[polars]
-```
-
-For ecosystem integrations (Pandera and Great Expectations), install with:
-
-```bash
-pip install lavendertown[pandera]
-pip install lavendertown[great_expectations]
-```
-
-For Phase 6 features (ML algorithms, time-series, profiling, Parquet export):
-
-```bash
-pip install lavendertown[ml]          # PyOD + scikit-learn for 40+ ML anomaly detection algorithms
-pip install lavendertown[timeseries]  # Ruptures for change point detection
-pip install lavendertown[profiling]   # ydata-profiling for comprehensive data profiling reports
-pip install lavendertown[parquet]     # PyArrow for Parquet export/import
-pip install lavendertown[stats]       # scipy.stats for statistical tests in drift detection
-```
-
-**Note:** LavenderTown is compatible with both altair 4.x and 5.x. Installing Great Expectations will automatically install altair 4.x (which is compatible with LavenderTown).
-
-For all Phase 6 features, install with:
-```bash
-pip install lavendertown[ml,timeseries,profiling,parquet,stats]
-```
+For optional features (Polars, ML, time-series, Plotly, etc.), see the [Installation Guide](https://lavendertown.readthedocs.io/en/latest/getting-started/installation.html).
 
 ## 🚀 Quick Start
-
-### Basic Usage
 
 ```python
 import streamlit as st
@@ -82,222 +46,20 @@ df = pd.read_csv("your_data.csv")
 
 # Create inspector and render
 inspector = Inspector(df)
-inspector.render()  # This must be called within a Streamlit app context
+inspector.render()  # Must be called within a Streamlit app context
 ```
 
-That's it! Save this code in a file (e.g., `app.py`) and run `streamlit run app.py` to see the interactive data quality dashboard.
+Save this as `app.py` and run `streamlit run app.py` to see the interactive dashboard.
 
-### Using Polars
+👉 **[Full Quick Start Guide →](https://lavendertown.readthedocs.io/en/latest/getting-started/quick-start.html)**
 
-LavenderTown works seamlessly with Polars DataFrames:
+## 📚 Documentation
 
-```python
-import streamlit as st
-from lavendertown import Inspector
-import polars as pl
-
-# Load your data with Polars
-df = pl.read_csv("your_data.csv")
-
-# Create inspector and render (works with Polars too!)
-inspector = Inspector(df)
-inspector.render()  # This must be called within a Streamlit app context
-```
-
-### Standalone CSV Upload App
-
-For quick analysis without writing code, use the included Streamlit app:
-
-```bash
-streamlit run examples/app.py
-```
-
-This opens a web interface where you can:
-- Upload CSV files via drag-and-drop or file browser with enhanced UI
-- See animated progress indicators during file processing
-- Automatic encoding detection (UTF-8, Latin-1, ISO-8859-1, CP1252)
-- Preview your data before analysis
-- View interactive data quality insights
-- Export findings with download buttons
-
-**New in v0.6.0:** The upload experience includes polished animations, automatic encoding detection, and enhanced visual feedback for a professional user experience.
-
-See the [examples directory](https://github.com/eddiethedean/lavendertown/tree/main/examples) and [examples/README.md](https://github.com/eddiethedean/lavendertown/blob/main/examples/README.md) for more usage examples and detailed instructions.
-
-## 📚 Usage Examples
-
-### Dataset Comparison (Drift Detection)
-
-Compare datasets to detect schema and distribution changes:
-
-```python
-from lavendertown import Inspector
-import pandas as pd
-
-# Create baseline and current datasets
-baseline_df = pd.DataFrame({
-    "customer_id": [1, 2, 3, 4, 5],
-    "age": [25, 30, 35, 40, 45],
-    "purchase_amount": [100.50, 200.00, 150.75, 300.00, 250.50],
-})
-
-current_df = pd.DataFrame({
-    "customer_id": [1, 2, 3, 4, 5, 6],  # New row
-    "age": [25, 30, 35, 40, 45, 50],  # New row
-    "purchase_amount": [100.50, 250.00, 150.75, 400.00, 250.50, 500.00],  # Changed values
-    "new_column": [1, 2, 3, 4, 5, 6],  # New column
-})
-
-inspector = Inspector(current_df)
-drift_findings = inspector.compare_with_baseline(
-    baseline_df=baseline_df,
-    comparison_type="full"  # or "schema_only", "distribution_only"
-)
-
-# Drift findings have ghost_type="drift"
-for finding in drift_findings:
-    if finding.ghost_type == "drift":
-        print(f"{finding.column}: {finding.description}")
-        print(f"  Change type: {finding.metadata.get('change_type', 'N/A')}")
-```
-
-**Example Output:**
-```
-new_column: New column 'new_column' added to dataset
-  Change type: column_added
-email: Column 'email' became nullable
-  Change type: nullability_change
-age: Column 'age' range shifted from [25.00, 45.00] to [25.00, 50.00]
-  Change type: numeric_range
-purchase_amount: Column 'purchase_amount' range shifted from [100.50, 300.00] to [100.50, 500.00]
-  Change type: numeric_range
-```
-
-> **Note:** This is actual output from running the code above. The exact drift findings depend on the differences between your baseline and current datasets.
-
-### Custom Data Quality Rules
-
-Create custom rules through the Streamlit UI:
-
-1. Click "Manage Rules" in the sidebar
-2. Create rules of different types:
-   - **Range rules**: Validate numeric values within min/max bounds
-   - **Regex rules**: Pattern matching for string columns
-   - **Enum rules**: Allow only specific values in a column
-3. Rules execute automatically with each analysis
-4. Export/import rules as JSON for reuse across projects
-
-### Command-Line Interface (CLI)
-
-LavenderTown includes a powerful CLI with beautiful, interactive output for batch processing and automation. The CLI features progress bars, formatted tables, and color-coded messages for an enhanced user experience:
-
-```bash
-# Analyze a single CSV file
-lavendertown analyze data.csv --output-format json --output-dir results/
-
-# Batch process multiple files
-lavendertown analyze-batch data/ --output-dir results/
-
-# Compare datasets for drift detection
-lavendertown compare baseline.csv current.csv --output-format json
-
-# Export rules to Pandera or Great Expectations
-lavendertown export-rules rules.json --format pandera --output-file schema.py
-lavendertown export-rules rules.json --format great_expectations --output-file suite.json
-```
-
-**CLI Options:**
-- `--rules PATH`: Path to rules JSON file
-- `--output-format [json|csv]`: Output format (default: `json`)
-- `--output-dir DIRECTORY`: Output directory (for batch processing)
-- `--output-file PATH`: Specific output file path (overrides output-dir)
-- `--backend [pandas|polars]`: DataFrame backend (default: `pandas`)
-- `--quiet`: Suppress progress output
-- `--verbose`: Verbose output with detailed error messages
-
-**Note:** For the best CLI experience with enhanced formatting, install with the `cli` extra:
-```bash
-pip install lavendertown[cli]
-```
-
-This includes Rich for beautiful terminal output, python-dotenv for configuration management, orjson for faster JSON processing, and Typer for modern type-hint based CLI commands.
-
-**New in Phase 6:** LavenderTown now supports Parquet export format and includes a modern Typer-based CLI (available alongside the existing Click CLI). Install `lavendertown[parquet]` for Parquet support.
-
-**Example CLI Usage:**
-
-```bash
-# Analyze with verbose output
-lavendertown analyze data.csv --verbose
-
-# Batch process with Polars backend
-lavendertown analyze-batch data/ --output-dir results/ --backend polars
-
-# Analyze with custom rules
-lavendertown analyze data.csv --rules my_rules.json --output-format csv
-```
-
-See `lavendertown --help` or `lavendertown analyze --help` for full documentation.
-
-### Programmatic Usage
-
-Use LavenderTown in your Python scripts:
-
-```python
-from lavendertown import Inspector
-import pandas as pd
-
-# Create sample data with quality issues
-data = {
-    "product_id": [1, 2, 3, 4, 5, 6, 7, 8],
-    "price": [10.99, 25.50, None, 45.00, -5.00, 100.00, 200.00, 300.00],
-    "quantity": [100, 50, 75, None, 200, 150, 0, 300],
-    "category": ["A", "B", "A", "C", "A", "B", "A", "C"],
-}
-df = pd.DataFrame(data)
-
-inspector = Inspector(df)
-
-# Get findings programmatically
-findings = inspector.detect()
-
-# Filter by severity
-errors = [f for f in findings if f.severity == "error"]
-warnings = [f for f in findings if f.severity == "warning"]
-info_items = [f for f in findings if f.severity == "info"]
-
-print(f"Total findings: {len(findings)}")
-print(f"Errors: {len(errors)}, Warnings: {len(warnings)}, Info: {len(info_items)}")
-
-# Access finding details
-for finding in findings:
-    print(f"\nColumn: {finding.column}")
-    print(f"Type: {finding.ghost_type}")
-    print(f"Severity: {finding.severity}")
-    print(f"Description: {finding.description}")
-    if finding.row_indices:
-        print(f"Affected rows: {len(finding.row_indices)}")
-```
-
-**Example Output:**
-```
-Total findings: 2
-Errors: 0, Warnings: 0, Info: 2
-
-Column: price
-Type: null
-Severity: info
-Description: Column 'price' has 1 null values (12.5% of 8 rows)
-Affected rows: 1
-
-Column: quantity
-Type: null
-Severity: info
-Description: Column 'quantity' has 1 null values (12.5% of 8 rows)
-Affected rows: 1
-```
-
-> **Note:** This is actual output from running the code above. The exact findings may vary based on the data and detection thresholds.
+- **[Getting Started](https://lavendertown.readthedocs.io/en/latest/getting-started/installation.html)** - Installation and setup
+- **[User Guide](https://lavendertown.readthedocs.io/en/latest/user-guide/basic-usage.html)** - Comprehensive usage documentation
+- **[API Reference](https://lavendertown.readthedocs.io/en/latest/api-reference/inspector.html)** - Complete API documentation
+- **[Examples](https://lavendertown.readthedocs.io/en/latest/guides/examples.html)** - Code examples and tutorials
+- **[Version Mapping](https://lavendertown.readthedocs.io/en/latest/VERSION_MAPPING.html)** - Feature version history
 
 ## 👻 Ghost Categories
 
@@ -308,77 +70,52 @@ LavenderTown detects four main categories of data quality issues:
 3. **Completeness Ghosts** - Null density thresholds, conditional nulls
 4. **Statistical Ghosts** - Outliers (IQR method), distribution shifts
 
-Each finding includes:
-- **Ghost type**: Category of the issue
-- **Column**: Affected column name
-- **Severity**: `info`, `warning`, or `error`
-- **Description**: Human-readable explanation
-- **Row indices**: Specific rows affected (when applicable)
-- **Metadata**: Additional diagnostic information
+👉 **[Learn more about ghost detection →](https://lavendertown.readthedocs.io/en/latest/user-guide/detectors.html)**
 
-## 🏗️ Architecture
+## 💡 Usage Examples
 
-LavenderTown is built with a plugin-based architecture:
+### Programmatic Usage
 
-- **Inspector**: Main orchestrator that coordinates detection and rendering
-- **Detectors**: Stateless, UI-agnostic modules for detecting specific ghost types
-  - `NullGhostDetector`: Detects excessive null values
-  - `TypeGhostDetector`: Identifies type inconsistencies
-  - `OutlierGhostDetector`: Finds statistical outliers using IQR method
-  - `RuleBasedDetector`: Executes custom user-defined rules
-- **UI Components**: Streamlit-native visualization components
-- **Export Layer**: Fast JSON, CSV, and Parquet export functionality (with orjson optimization and PyArrow support)
+```python
+from lavendertown import Inspector
+import pandas as pd
 
-## ⚙️ Configuration
+df = pd.read_csv("data.csv")
+inspector = Inspector(df)
+findings = inspector.detect()
 
-LavenderTown supports configuration through environment variables and `.env` files. Create a `.env` file in your project root or home directory:
-
-```bash
-# .env file example
-LAVENDERTOWN_LOG_LEVEL=INFO
-LAVENDERTOWN_OUTPUT_DIR=./results
+for finding in findings:
+    print(f"{finding.column}: {finding.description}")
 ```
 
-Configuration is automatically loaded when the package is imported. See the [documentation](https://lavendertown.readthedocs.io/en/latest/) for available configuration options.
+### CLI Usage
+
+```bash
+# Analyze a CSV file
+lavendertown analyze data.csv --output-format json
+
+# Compare datasets for drift
+lavendertown compare baseline.csv current.csv
+```
+
+👉 **[More examples →](https://lavendertown.readthedocs.io/en/latest/guides/examples.html)**
 
 ## 🛠️ Development
 
-### Installation for Development
-
 ```bash
+# Clone and install
 git clone https://github.com/eddiethedean/lavendertown.git
 cd lavendertown
 pip install -e ".[dev]"
-```
 
-### Running Tests
-
-```bash
+# Run tests
 pytest tests/
+
+# Code quality
+ruff format . && ruff check . && mypy lavendertown
 ```
 
-### Code Quality
-
-```bash
-# Format code
-ruff format .
-
-# Lint
-ruff check .
-
-# Type checking
-mypy lavendertown/
-```
-
-## 📊 Performance
-
-LavenderTown is optimized for performance:
-
-- **Small datasets (<10k rows)**: Near-instantaneous analysis
-- **Medium datasets (10k-100k rows)**: Sub-second analysis
-- **Large datasets (100k-1M rows)**: Optimized with caching and vectorized operations
-
-Benchmark results and optimization recommendations are documented in [docs/PERFORMANCE.md](https://github.com/eddiethedean/lavendertown/blob/main/docs/PERFORMANCE.md).
+👉 **[Development Guide →](https://lavendertown.readthedocs.io/en/latest/)**
 
 ## 🤝 Contributing
 
@@ -394,18 +131,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/eddiethedean/lavendertown/blob/main/LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- Built with [Streamlit](https://streamlit.io/) for the UI
-- Powered by [Pandas](https://pandas.pydata.org/) and [Polars](https://www.pola.rs/) for data processing
-- Visualizations created with [Altair](https://altair-viz.github.io/)
-
 ## 🔗 Links
 
-- **Documentation**: https://lavendertown.readthedocs.io/en/latest/
-- **Homepage**: https://github.com/eddiethedean/lavendertown
-- **Repository**: https://github.com/eddiethedean/lavendertown
-- **Issues**: https://github.com/eddiethedean/lavendertown/issues
+- **📖 Documentation**: https://lavendertown.readthedocs.io/en/latest/
+- **📦 PyPI Package**: https://pypi.org/project/lavendertown/
+- **🐙 GitHub Repository**: https://github.com/eddiethedean/lavendertown
+- **🐛 Issues**: https://github.com/eddiethedean/lavendertown/issues
 
 ---
 
